@@ -51,18 +51,36 @@ export default {
   methods: {
     onSubmit (evt) {
       evt.preventDefault()
-      this.hasClicked = true
-      this.login().then(response => {
-        if (response) {
-          this.loginStatus = '登陆成功'
-        } else {
-          this.loginStatus = 'ID或密码不正确'
-          this.hasClicked = false
-        }
-      })
+      if (this.hasClicked) {
+        return
+      }
+      let idRex = /[0-9]+/
+      if (idRex.test(this.form.userId)) {
+        this.hasClicked = true
+        this.loginStatus = '登陆中...'
+        this.login().then(response => {
+          if (response === 100) {
+            this.loginStatus = '登陆成功'
+          } else if (response === 500) {
+            this.loginStatus = '账户尚未激活'
+            this.hasClicked = false
+          } else if (response === 210) {
+            this.loginStatus = '登陆超时，请重试'
+            this.hasClicked = false
+          } else {
+            this.loginStatus = 'ID或密码不正确'
+            this.hasClicked = false
+          }
+        })
+      } else {
+        this.loginStatus = 'ID必须为数字'
+      }
     },
     onReset (evt) {
       evt.preventDefault()
+      if (this.hasClicked) {
+        return
+      }
       /* Reset our form values */
       this.form.userId = ''
       this.form.password = ''
@@ -74,18 +92,20 @@ export default {
       })
     },
     async login () {
-      var isSuccess = false
       let postData = { 'userId': this.form.userId, 'password': this.form.password }
-
-      await this.axios.post(this.loginApi, postData).then(response => {
+      let statusCode = 200
+      await this.axios.post(this.loginApi, postData, { timeout: 15000 }).then(response => {
         console.log(response.data)
-        if (response.data === 100) {
-          isSuccess = true
-        }
+        statusCode = response.data
       }, response => {
-        console.log('post failed')
+        if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+          statusCode = 210
+        } else {
+          console.log('post failed')
+          console.log(response)
+        }
       })
-      return isSuccess
+      return statusCode
     }
   }
 }
