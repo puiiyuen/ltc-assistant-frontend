@@ -1,6 +1,6 @@
 <template>
-  <div id="loginFrame">
-    <div id="login">
+  <div id="activateFrame">
+    <div id="activate">
       <b-form @submit="onSubmit" @reset="onReset" v-if="show">
         <b-form-group id="userId"
                       label="ID:"
@@ -12,8 +12,18 @@
                         placeholder="输入ID">
           </b-form-input>
         </b-form-group>
+        <b-form-group id="activateCode"
+                      label="激活码:"
+                      label-for="activateCodeInput">
+          <b-form-input id="activateCodeInput"
+                        type="text"
+                        v-model="form.activateCode"
+                        required
+                        placeholder="输入激活码">
+          </b-form-input>
+        </b-form-group>
         <b-form-group id="password"
-                      label="密码:"
+                      label="请输入密码:"
                       label-for="passwordInput">
           <b-form-input id="passwordInput"
                         type="password"
@@ -22,10 +32,20 @@
                         placeholder="输入密码">
           </b-form-input>
         </b-form-group>
-        <div id="loginStatus">
-          <span>{{loginStatus}}</span>
+        <b-form-group id="password2"
+                      label="请再次输入密码:"
+                      label-for="password2Input">
+          <b-form-input id="password2Input"
+                        type="password"
+                        v-model="form.password2"
+                        required
+                        placeholder="输入密码">
+          </b-form-input>
+        </b-form-group>
+        <div id="activateStatus">
+          <span>{{activateStatus}}</span>
         </div>
-        <b-button type="submit" variant="primary" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">登陆
+        <b-button type="submit" variant="primary" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">激活
         </b-button>
         <b-button type="reset" variant="danger" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
         </b-button>
@@ -36,15 +56,18 @@
 
 <script>
 export default {
+  name: 'Activate',
   data () {
     return {
       form: {
         userId: '',
-        password: ''
+        password: '',
+        password2: '',
+        activateCode: ''
       },
-      loginStatus: '',
+      activateStatus: '',
       show: true,
-      loginApi: 'http://localhost:8080/login',
+      activateApi: 'http://localhost:8080/activate',
       hasClicked: false
     }
   },
@@ -56,29 +79,29 @@ export default {
       }
       let idRex = /[0-9]+/
       if (idRex.test(this.form.userId)) {
-        this.hasClicked = true
-        this.loginStatus = '登陆中...'
-        this.login().then(response => {
-          if (response === 100) {
-            this.loginStatus = '登陆成功'
-            this.$router.push({ name: 'dashboard' })
-          } else if (response === 500) {
-            this.loginStatus = '账户尚未激活'
-            this.hasClicked = false
-            this.$router.push({ name: 'activate' })
-          } else if (response === 210) {
-            this.loginStatus = '请求超时，请重试'
-            this.hasClicked = false
-          } else if (response === -999) {
-            this.loginStatus = '服务器开小差了，请重试'
-            this.hasClicked = false
-          } else {
-            this.loginStatus = 'ID或密码不正确'
-            this.hasClicked = false
-          }
-        })
+        if (this.form.password === this.form.password2) {
+          this.hasClicked = true
+          this.activateStatus = '激活中...'
+          this.activate().then(response => {
+            if (response === 100) {
+              this.activateStatus = '激活成功'
+              this.$router.push({ name: 'login' })
+            } else if (response === 210) {
+              this.activateStatus = '请求超时，请重试'
+              this.hasClicked = false
+            } else if (response === -999) {
+              this.activateStatus = '服务器开小差了，请重试'
+              this.hasClicked = false
+            } else {
+              this.activateStatus = 'ID或激活码不正确'
+              this.hasClicked = false
+            }
+          })
+        } else {
+          this.activateStatus = '两次密码输入不一致'
+        }
       } else {
-        this.loginStatus = 'ID必须为数字'
+        this.activateStatus = 'ID必须为数字'
       }
     },
     onReset (evt) {
@@ -89,17 +112,19 @@ export default {
       /* Reset our form values */
       this.form.userId = ''
       this.form.password = ''
-      this.loginStatus = ''
+      this.activateStatus = ''
       /* Trick to reset/clear native browser form validation state */
       this.show = false
       this.$nextTick(() => {
         this.show = true
       })
     },
-    async login () {
-      let postData = { 'userId': this.form.userId, 'password': this.form.password }
+    async activate () {
+      let postData = { 'userId': this.form.userId,
+        'password': this.form.password,
+        'activateCode': this.form.activateCode }
       let statusCode = 200
-      await this.axios.post(this.loginApi, postData, { timeout: 15000 }).then(response => {
+      await this.axios.post(this.activateApi, postData, { timeout: 15000 }).then(response => {
         console.log(response.data)
         statusCode = response.data
       }, response => {
@@ -112,15 +137,12 @@ export default {
       })
       return statusCode
     }
-  },
-  created () {
-    this.checkSession()
   }
 }
 </script>
 
 <style scoped>
-  #loginFrame {
+  #activateFrame {
     position: absolute;
     top: 0;
     left: 0;
@@ -128,18 +150,18 @@ export default {
     right: 0;
     margin: auto;
     width: 320px;
-    height: 280px;
+    height: 450px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 10px;
   }
 
-  #login {
+  #activate {
     padding: 15px 0;
     width: 280px;
     margin: auto;
   }
 
-  #loginStatus {
+  #activateStatus {
     padding-bottom: 10px;
     font-size: 13px;
     color: red;

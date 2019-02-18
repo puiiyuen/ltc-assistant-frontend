@@ -1,28 +1,18 @@
 <template>
-  <div id="app">
-    <router-view/>
+  <div>
+    <h1>I am Dashboard</h1>
   </div>
-
 </template>
 
 <script>
-
 export default {
-  name: 'App',
-  data () {
-    return {
-
-    }
-  },
-  methods: {
-  },
+  name: 'Dashboard',
   created () {
     this.checkSession()
   }
-
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>
