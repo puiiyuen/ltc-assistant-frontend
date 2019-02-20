@@ -13,6 +13,9 @@ export default new Router({
     {
       path: '/',
       name: 'home',
+      // meta: {
+      //   requireAuth: true // require authorization
+      // },
       component: App
     },
     {
@@ -28,12 +31,17 @@ export default new Router({
     {
       path: '/dashboard',
       name: 'dashboard',
+      meta: {
+        requireAuth: true // require authorization
+      },
       component: () => import('./views/Dashboard')
     },
     {
-      path: '/error',
+      // 404 error page
+      path: '*',
       name: 'error',
       component: Error
     }
   ]
+
 })

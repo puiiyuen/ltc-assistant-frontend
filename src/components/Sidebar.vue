@@ -1,14 +1,16 @@
 <template>
   <div id="option-list">
-    <!--<b-nav vertical class="w-25">-->
-      <!--<b-nav-item active>Active</b-nav-item>-->
-      <!--<b-nav-item>Link</b-nav-item>-->
-      <!--<b-nav-item>Another Link</b-nav-item>-->
-      <!--<b-nav-item disabled>Disabled</b-nav-item>-->
-    <!--</b-nav>-->
-    <ul class="list-group">
-      <li class="list-group-item">First item</li>
+    <div id="side-bar-title">
+      安全监控
+    </div>
+    <ul class="list-group parent-list-group">
+      <li class="list-group-item" data-toggle="collapse" href="#collapseExample">First item</li>
+      <ul class="list-group collapse children-list-group" id="collapseExample">
+        <li class="list-group-item">Third item</li>
+        <li class="list-group-item">Third item</li>
+      </ul>
       <li class="list-group-item">Second item</li>
+      <li class="list-group-item">Third item</li>
       <li class="list-group-item">Third item</li>
     </ul>
   </div>
@@ -22,18 +24,37 @@ export default {
 
 <style scoped>
 
-#option-list{
-  padding-top:50px;
+#side-bar-title{
+  color: #FFFFFF;
+  padding: 20px 20px;
+  font-weight: bolder;
+  font-size: 18px;
 }
+
+.list-group{
+  padding: 0;
+}
+
 .list-group-item{
   cursor: pointer;
   border-style: none;
-  background-color: #2196F3;
-  color: #FFFFFF;
+  border-radius: 0;
+  color: #bbb;
   font-weight: bold;
 }
-.list-group-item:hover{
-  background-color: #03A9F4;
 
+.parent-list-group .list-group-item{
+  background-color: #343a40;
+  font-weight: bold;
+}
+
+.children-list-group .list-group-item{
+  background-color: #262626;
+  font-weight: normal;
+}
+
+.list-group-item:hover{
+  background-color: #6c757d;
+  color: #FFFFFF;
 }
 </style>

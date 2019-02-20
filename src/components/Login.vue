@@ -61,6 +61,7 @@ export default {
         this.login().then(response => {
           if (response === 100) {
             this.loginStatus = '登陆成功'
+            // this.$store.commit('online')
             this.$router.push({ name: 'dashboard' })
           } else if (response === 500) {
             this.loginStatus = '账户尚未激活'
@@ -114,7 +115,7 @@ export default {
     }
   },
   created () {
-    this.checkSession()
+    // this.checkSession()
   }
 }
 </script>

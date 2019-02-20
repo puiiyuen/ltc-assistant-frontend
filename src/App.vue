@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <Navbar/>
-    <div id="Navbar-height"></div>
     <router-view/>
   </div>
 
@@ -28,7 +27,5 @@ export default {
 </script>
 
 <style>
-#Navbar-height{
-  height: 56px;
-}
+
 </style>

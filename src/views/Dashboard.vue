@@ -2,8 +2,12 @@
   <div>
     <b-container fluid>
       <b-row>
-        <b-col cols="2" id="side-bar" v-bind:style="{height:dashHeight}" class="default-primary-color">
-          <Sidebar/>
+        <b-col cols="2">
+          <b-row>
+            <b-col cols="9" id="side-bar" v-bind:style="{height:dashHeight}" class="bg-dark">
+              <Sidebar/>
+            </b-col>
+          </b-row>
         </b-col>
         <b-col cols="10" id="panel" v-bind:style="{height:dashHeight}">
           <Panel/>
@@ -20,17 +24,17 @@ export default {
   name: 'Dashboard',
   data () {
     return {
-      dashHeight: (document.documentElement.clientHeight - 56) + 'px'
+      dashHeight: (document.documentElement.clientHeight - 60) + 'px'
     }
   },
   components: { Panel, Sidebar },
   created () {
-    this.checkSession()
+    // this.checkSession()
   },
   mounted () {
     const that = this // 'this' cannot be used directly
     window.onresize = function () {
-      that.dashHeight = (document.documentElement.clientHeight - 56) + 'px'
+      that.dashHeight = (document.documentElement.clientHeight - 60) + 'px'
     }
   }
 }
