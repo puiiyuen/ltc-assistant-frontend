@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Navbar/>
-    <router-view/>
+    <transition name="fade">
+      <router-view/>
+    </transition>
   </div>
 
 </template>
@@ -20,9 +22,17 @@ export default {
   methods: {
   },
   created () {
-    this.checkSession()
+    this.axios.get('http://localhost:8080/session').then(response => {
+      if (response.data === 300) {
+        this.$store.commit('setUser')
+      } else {
+        this.$store.commit('setDefaultUser')
+      }
+    }, response => {
+      console.log('get online status failed')
+      console.log(response.data)
+    })
   }
-
 }
 </script>
 

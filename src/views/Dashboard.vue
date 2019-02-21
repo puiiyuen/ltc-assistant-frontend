@@ -29,7 +29,7 @@ export default {
   },
   components: { Panel, Sidebar },
   created () {
-    // this.checkSession()
+    this.checkSession()
   },
   mounted () {
     const that = this // 'this' cannot be used directly

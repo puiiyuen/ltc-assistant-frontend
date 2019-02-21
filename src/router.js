@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from './components/Login'
 import Error from './views/Error'
-import App from './App'
+import Home from './views/Home'
 
 Vue.use(Router)
 
@@ -13,19 +13,25 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      // meta: {
-      //   requireAuth: true // require authorization
-      // },
-      component: App
+      meta: {
+        requireAuth: false
+      },
+      component: Home
     },
     {
       path: '/login',
       name: 'login',
+      meta: {
+        requireAuth: false // require authorization
+      },
       component: Login
     },
     {
-      path: '/login/activate',
+      path: '/activate',
       name: 'activate',
+      meta: {
+        requireAuth: false
+      },
       component: () => import('./components/Activate')
     },
     {
@@ -40,6 +46,9 @@ export default new Router({
       // 404 error page
       path: '*',
       name: 'error',
+      meta: {
+        requireAuth: false
+      },
       component: Error
     }
   ]

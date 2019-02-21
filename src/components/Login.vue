@@ -31,10 +31,12 @@
         </b-button>
       </b-form>
     </div>
+    <router-view/>
   </div>
 </template>
 
 <script>
+import vuex from '@/store'
 export default {
   data () {
     return {
@@ -44,7 +46,7 @@ export default {
       },
       loginStatus: '',
       show: true,
-      loginApi: 'http://localhost:8080/login',
+      api: 'http://localhost:8080/',
       hasClicked: false
     }
   },
@@ -61,7 +63,7 @@ export default {
         this.login().then(response => {
           if (response === 100) {
             this.loginStatus = '登陆成功'
-            // this.$store.commit('online')
+            this.fetchData()
             this.$router.push({ name: 'dashboard' })
           } else if (response === 500) {
             this.loginStatus = '账户尚未激活'
@@ -100,7 +102,7 @@ export default {
     async login () {
       let postData = { 'userId': this.form.userId, 'password': this.form.password }
       let statusCode = 200
-      await this.axios.post(this.loginApi, postData, { timeout: 15000 }).then(response => {
+      await this.axios.post(this.api + 'login', postData, { timeout: 15000 }).then(response => {
         console.log(response.data)
         statusCode = response.data
       }, response => {
@@ -112,10 +114,21 @@ export default {
         }
       })
       return statusCode
+    },
+    fetchData () {
+      this.axios.get(this.api + 'user').then(response => {
+        localStorage.setItem('user', JSON.stringify(response.data))
+        vuex.commit('setUser')
+      }, response => {
+        console.log('post failed')
+        console.log(response)
+      })
     }
   },
   created () {
-    // this.checkSession()
+    if (this.$store.getters.getOnline) {
+      this.$router.push({ name: 'home' })
+    }
   }
 }
 </script>
