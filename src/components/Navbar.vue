@@ -20,11 +20,14 @@
             所有功能
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <router-link :to="{name: 'dashboard'}" class="dropdown-item" >安全监控 </router-link>
+            <router-link :to="{name: 'senior', params:{toPath:'senior'}}" class="dropdown-item" >长者管理 </router-link>
+            <router-link :to="{name: 'security', params:{toPath:'security'}}" class="dropdown-item" >安全监控 </router-link>
+            <router-link :to="{name: 'message', params:{toPath:'message'}}" class="dropdown-item" >消息管理 </router-link>
+            <router-link :to="{name: 'staff', params:{toPath:'staff'}}" class="dropdown-item" >员工管理 </router-link>
           </div>
         </li>
       </ul>
-      <span class="navbar-text">欢迎使用智慧助手</span>
+      <span class="navbar-text">智慧助手 v0.1.0</span>
       <div class="btn-group" id="user-center"  v-show="!online">
         <router-link :to="{name: 'login'}" tag="span" class="navbar-text">登陆管理系统</router-link>
       </div>
@@ -33,7 +36,7 @@
           {{username}}
         </span>
         <div class="dropdown-menu dropdown-menu-right" >
-          <router-link :to="{name: 'dashboard'}" class="dropdown-item" >个人中心 </router-link>
+          <!--<router-link :to="{name: 'dashboard'}" class="dropdown-item" >个人中心 </router-link>-->
           <a class="dropdown-item" @click="logout">注销</a>
         </div>
       </div>

@@ -25,9 +25,9 @@
         <div id="loginStatus">
           <span>{{loginStatus}}</span>
         </div>
-        <b-button type="submit" variant="primary" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">登陆
+        <b-button type="submit" variant="primary" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">登陆
         </b-button>
-        <b-button type="reset" variant="danger" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
+        <b-button type="reset" variant="danger" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
         </b-button>
       </b-form>
     </div>
@@ -64,7 +64,11 @@ export default {
           if (response === 100) {
             this.loginStatus = '登陆成功'
             this.fetchData()
-            this.$router.push({ name: 'dashboard' })
+            if (this.$route.params.toPath !== undefined) {
+              this.$router.push({ name: this.$route.params.toPath })
+            } else {
+              this.$router.push({ name: 'home' })
+            }
           } else if (response === 500) {
             this.loginStatus = '账户尚未激活'
             this.hasClicked = false
@@ -144,7 +148,7 @@ export default {
     width: 320px;
     height: 280px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    border-radius: 10px;
+    /*border-radius: 10px;*/
   }
 
   #login {
@@ -162,5 +166,6 @@ export default {
   .sub-btn {
     padding: 4px 20px;
     margin-right: 5px;
+    border-radius: 0;
   }
 </style>

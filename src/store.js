@@ -29,7 +29,6 @@ export default new Vuex.Store({
     getOnline (state) {
       return state.user.online
     }
-
   },
   actions: {
 

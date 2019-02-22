@@ -45,9 +45,9 @@
         <div id="activateStatus">
           <span>{{activateStatus}}</span>
         </div>
-        <b-button type="submit" variant="primary" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">激活
+        <b-button type="submit" variant="primary" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">激活
         </b-button>
-        <b-button type="reset" variant="danger" size="sm" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
+        <b-button type="reset" variant="danger" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
         </b-button>
       </b-form>
     </div>
@@ -152,7 +152,7 @@ export default {
     width: 320px;
     height: 450px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    border-radius: 10px;
+    /*border-radius: 10px;*/
   }
 
   #activate {
@@ -170,5 +170,6 @@ export default {
   .sub-btn {
     padding: 4px 20px;
     margin-right: 5px;
+    border-radius: 0;
   }
 </style>

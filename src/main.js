@@ -28,6 +28,7 @@ new Vue({
 }).$mount('#app')
 
 router.beforeEach((to, from, next) => {
+  // console.log('beforeEach ' + to.params.pt)
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
     try {
       checkSession().then(response => {
@@ -35,7 +36,8 @@ router.beforeEach((to, from, next) => {
           next()
         } else {
           next({
-            name: 'login'
+            name: 'login',
+            params: { toPath: to.params.toPath }
           })
         }
       })
@@ -51,8 +53,8 @@ router.beforeEach((to, from, next) => {
 async function checkSession () {
   let isOnline = false
   await axios.get('http://localhost:8080/session').then(response => {
-    console.log(response.data)
     if (response.data === 300) {
+      console.log('online ' + response.data)
       isOnline = true
     }
   }, response => {

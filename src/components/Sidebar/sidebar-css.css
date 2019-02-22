@@ -1,0 +1,47 @@
+
+#side-bar-title{
+    color: #FFFFFF;
+    padding: 20px 20px;
+    font-weight: bolder;
+    font-size: 18px;
+}
+
+#side-bar-title:hover{
+    cursor: pointer;
+}
+
+.list-group{
+    padding: 0;
+}
+
+.list-group-item{
+    cursor: pointer;
+    border-style: none;
+    border-radius: 0;
+    color: #bbb;
+}
+
+.parent-list-group .list-group-item{
+    background-color: #343a40;
+    font-weight: bold;
+}
+
+.children-list-group .list-group-item{
+    background-color: #262626;
+    font-weight: normal;
+}
+
+.list-group-item:hover{
+    background-color: #6c757d;
+    color: #FFFFFF;
+}
+.link-selected{
+    color: #FFFFFF;
+}
+#side-bar{
+    overflow-y: auto;
+    padding: 0;
+}
+#panel{
+    overflow-y: auto;
+}

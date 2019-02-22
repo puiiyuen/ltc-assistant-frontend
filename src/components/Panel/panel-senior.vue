@@ -1,8 +1,8 @@
 <template>
   <b-container fluid>
     <div id="panel-detail">
-      <h2>操控台</h2>
-      <p>请选择左侧菜单功能进行操作</p>
+      <h2>长者管理</h2>
+      <p>请选择从左侧菜单选取</p>
     </div>
 
   </b-container>
@@ -12,8 +12,7 @@
 export default {
   name: 'Panel',
   data () {
-    return {
-    }
+    return {}
   }
 }
 </script>

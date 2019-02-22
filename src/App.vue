@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     <Navbar/>
-    <transition name="fade">
-      <router-view/>
-    </transition>
+    <router-view/>
   </div>
 
 </template>
@@ -24,6 +22,7 @@ export default {
   created () {
     this.axios.get('http://localhost:8080/session').then(response => {
       if (response.data === 300) {
+        console.log('App online')
         this.$store.commit('setUser')
       } else {
         this.$store.commit('setDefaultUser')

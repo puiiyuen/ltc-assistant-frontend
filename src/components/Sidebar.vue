@@ -1,24 +1,22 @@
 <template>
   <div id="option-list">
-    <div id="side-bar-title">
-      安全监控
-    </div>
+    <div id="side-bar-title">操控台</div>
     <ul class="list-group parent-list-group">
-      <li class="list-group-item" data-toggle="collapse" href="#collapseExample">First item</li>
-      <ul class="list-group collapse children-list-group" id="collapseExample">
-        <li class="list-group-item">Third item</li>
-        <li class="list-group-item">Third item</li>
-      </ul>
-      <li class="list-group-item">Second item</li>
-      <li class="list-group-item">Third item</li>
-      <li class="list-group-item">Third item</li>
+      <router-link :to="{name: 'senior', params:{toPath:'senior'}}" tag="li" class="list-group-item" >长者管理 </router-link>
+      <router-link :to="{name: 'security', params:{toPath:'security'}}" tag="li" class="list-group-item" >安全监控 </router-link>
+      <router-link :to="{name: 'message', params:{toPath:'message'}}" tag="li" class="list-group-item" >消息管理 </router-link>
+      <router-link :to="{name: 'staff', params:{toPath:'staff'}}" tag="li" class="list-group-item" >员工管理 </router-link>
     </ul>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Sidebar'
+  name: 'Sidebar',
+  data () {
+    return {
+    }
+  }
 }
 </script>
 
