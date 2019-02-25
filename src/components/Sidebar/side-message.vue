@@ -8,6 +8,8 @@
               <router-link :to="{name: 'message', params:{toPath:'message'}}"
                            tag="div" id="side-bar-title">消息管理</router-link>
               <ul class="list-group parent-list-group">
+                <router-link :to="{name: 'message', params:{toPath:'message'}}" class="list-group-item"
+                             tag="li">概览</router-link>
                 <router-link :to="{name: 'bulletinBoard', params:{toPath:'bulletinBoard'}}" class="list-group-item"
                              tag="li" active-class="link-selected">公告发布</router-link>
                 <router-link :to="{name: 'feedback', params:{toPath:'feedback'}}" class="list-group-item"

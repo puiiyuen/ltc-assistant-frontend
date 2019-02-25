@@ -8,6 +8,8 @@
               <router-link :to="{name: 'security', params:{toPath:'security'}}"
                            tag="div" id="side-bar-title">安全监控</router-link>
               <ul class="list-group parent-list-group">
+                <router-link :to="{name: 'security', params:{toPath:'security'}}" class="list-group-item"
+                             tag="li">概览</router-link>
                 <router-link :to="{name: 'SOS', params:{toPath:'SOS'}}" class="list-group-item"
                              tag="li" active-class="link-selected">紧急求助处理</router-link>
                 <router-link :to="{name: 'warning', params:{toPath:'warning'}}" class="list-group-item"

@@ -1,5 +1,6 @@
 <template>
   <div id="activateFrame">
+    <div id="title"><h3>账户激活</h3></div>
     <div id="activate">
       <b-form @submit="onSubmit" @reset="onReset" v-if="show">
         <b-form-group id="userId"
@@ -142,6 +143,13 @@ export default {
 </script>
 
 <style scoped>
+
+  #title{
+    margin: auto;
+    text-align: center;
+    padding-top: 30px;
+  }
+
   #activateFrame {
     position: absolute;
     top: 0;
@@ -150,7 +158,7 @@ export default {
     right: 0;
     margin: auto;
     width: 320px;
-    height: 450px;
+    height: 500px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*border-radius: 10px;*/
   }

@@ -1,37 +1,39 @@
 <template>
-  <div id="loginFrame">
-    <div id="login">
-      <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-        <b-form-group id="userId"
-                      label="ID:"
-                      label-for="userIdInput">
-          <b-form-input id="userIdInput"
-                        type="text"
-                        v-model="form.userId"
-                        required
-                        placeholder="输入ID">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="password"
-                      label="密码:"
-                      label-for="passwordInput">
-          <b-form-input id="passwordInput"
-                        type="password"
-                        v-model="form.password"
-                        required
-                        placeholder="输入密码">
-          </b-form-input>
-        </b-form-group>
-        <div id="loginStatus">
-          <span>{{loginStatus}}</span>
-        </div>
-        <b-button type="submit" variant="primary" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">登陆
-        </b-button>
-        <b-button type="reset" variant="danger" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
-        </b-button>
-      </b-form>
+  <div>
+    <div id="loginFrame">
+      <div id="title"><h3>用户登录</h3></div>
+      <div id="login">
+        <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+          <b-form-group id="userId"
+                        label="ID:"
+                        label-for="userIdInput">
+            <b-form-input id="userIdInput"
+                          type="text"
+                          v-model="form.userId"
+                          required
+                          placeholder="输入ID">
+            </b-form-input>
+          </b-form-group>
+          <b-form-group id="password"
+                        label="密码:"
+                        label-for="passwordInput">
+            <b-form-input id="passwordInput"
+                          type="password"
+                          v-model="form.password"
+                          required
+                          placeholder="输入密码">
+            </b-form-input>
+          </b-form-group>
+          <div id="loginStatus">
+            <span>{{loginStatus}}</span>
+          </div>
+          <b-button type="submit" variant="primary" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">登陆
+          </b-button>
+          <b-button type="reset" variant="danger" size="md" class="sub-btn" v-bind:class="{disabled:hasClicked}">重置
+          </b-button>
+        </b-form>
+      </div>
     </div>
-    <router-view/>
   </div>
 </template>
 
@@ -138,6 +140,11 @@ export default {
 </script>
 
 <style scoped>
+  #title{
+    margin: auto;
+    text-align: center;
+    padding-top: 30px;
+  }
   #loginFrame {
     position: absolute;
     top: 0;
@@ -146,7 +153,7 @@ export default {
     right: 0;
     margin: auto;
     width: 320px;
-    height: 280px;
+    height: 350px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*border-radius: 10px;*/
   }
