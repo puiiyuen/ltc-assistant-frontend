@@ -20,8 +20,12 @@
                   <router-link :to="{name: 'bill', params:{toPath:'bill'}}" class="list-group-item"
                                tag="li" active-class="link-selected">个人账单</router-link>
                 </ul>
-                <router-link :to="{name: 'addResident', params:{toPath:'addResident'}}" class="list-group-item"
-                             tag="li" active-class="link-selected">添加住户</router-link>
+                <!--<li class="list-group-item" data-toggle="collapse" data-target="#addPersonInfo">添加信息-->
+                  <!--<i class="bottom-arrow"></i></li>-->
+                <!--<ul class="list-group children-list-group collapse" id="addPersonInfo">-->
+                  <!--<router-link :to="{name: 'addResident', params:{toPath:'addResident'}}" class="list-group-item"-->
+                               <!--tag="li" active-class="link-selected">添加基本信息</router-link>-->
+                <!--</ul>-->
               </ul>
             </div>
           </b-col>

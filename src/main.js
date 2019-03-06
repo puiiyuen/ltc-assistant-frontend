@@ -7,15 +7,18 @@ import BootstrapVue from 'bootstrap-vue'
 import palette from './util/palette.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import Datepicker from 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.css'
 
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
 Vue.use(session)
 Vue.use(palette)
+Vue.use(Datepicker)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
@@ -28,7 +31,6 @@ new Vue({
 }).$mount('#app')
 
 router.beforeEach((to, from, next) => {
-  // console.log('beforeEach ' + to.params.pt)
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
     try {
       checkSession().then(response => {

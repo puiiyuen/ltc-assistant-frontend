@@ -66,11 +66,10 @@ export default {
           if (response === 100) {
             this.loginStatus = '登陆成功'
             this.fetchData()
-            if (this.$route.params.toPath !== undefined) {
-              this.$router.push({ name: this.$route.params.toPath })
-            } else {
-              this.$router.push({ name: 'home' })
-            }
+            this.form.userId = ''
+            this.form.password = ''
+            this.loginStatus = ''
+            this.hasClicked = false
           } else if (response === 500) {
             this.loginStatus = '账户尚未激活'
             this.hasClicked = false
@@ -130,51 +129,44 @@ export default {
         console.log(response)
       })
     }
-  },
-  created () {
-    this.checkSession().then(response => {
-      if (response) {
-        this.$router.push({ name: 'home' })
-      }
-    })
   }
 }
 </script>
 
 <style scoped>
-  #title{
-    margin: auto;
-    text-align: center;
-    padding-top: 30px;
-  }
-  #loginFrame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-    width: 320px;
-    height: 350px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    /*border-radius: 10px;*/
-  }
+#title{
+  margin: auto;
+  text-align: center;
+  padding-top: 30px;
+}
+#loginFrame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  width: 320px;
+  height: 350px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  /*border-radius: 10px;*/
+}
 
-  #login {
-    padding: 15px 0;
-    width: 280px;
-    margin: auto;
-  }
+#login {
+  padding: 15px 0;
+  width: 280px;
+  margin: auto;
+}
 
-  #loginStatus {
-    padding-bottom: 10px;
-    font-size: 13px;
-    color: red;
-  }
+#loginStatus {
+  padding-bottom: 10px;
+  font-size: 13px;
+  color: red;
+}
 
-  .sub-btn {
-    padding: 4px 20px;
-    margin-right: 5px;
-    border-radius: 0;
-  }
+.sub-btn {
+  padding: 4px 20px;
+  margin-right: 5px;
+  border-radius: 0;
+}
 </style>
