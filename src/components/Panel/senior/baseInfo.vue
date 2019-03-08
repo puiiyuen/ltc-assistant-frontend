@@ -64,7 +64,7 @@
                 <td>{{residentDetail.sex}}</td>
                 <th scope="row">出生年月</th>
                 <td>{{residentDetail.dob}}</td>
-                <td><img :src="residentDetail.photoUrl" alt="照片" style="width: 100px"></td>
+                <td rowspan="3"><img :src="residentDetail.photoUrl" alt="照片" style="width: 100px"></td>
                 <!--<td rowspan="3"><img src="../../../assets/graduate.jpg" alt="照片" style="width: 100px"></td>-->
               </tr>
               <tr>
@@ -131,7 +131,7 @@
                   </div>
                   <div class="form-group col-3">
                     <label for="newResSex">性别</label>
-                    <select class="form-control" id="newResSex" v-model="newResident.sex">
+                    <select class="form-control" id="newResSex" v-model="newResident.sex" required>
                       <option value="" selected>选择</option>
                       <option value="MALE">男</option>
                       <option value="FEMALE">女</option>
@@ -139,8 +139,10 @@
                   </div>
                   <div class="form-group col-3">
                     <label for="newResDob">出生年月</label>
-                    <input type="text" class="datepicker form-control" id="newResDob" data-provide="datepicker"
-                           data-date-format="yyyy-mm-dd" placeholder="选择日期" required v-model="newResident.dob">
+                    <datepicker id="newResDob" format="yyyy-MM-dd" :language="language.zh"
+                                placeholder="选择日期" v-model="newResident.dob" :required="true"
+                                :clear-button="true" :bootstrap-styling="true" :typeable="true"/>
+                    <!--{{dobFormat}}-->
                   </div>
                   <div class="form-group col-3">
                     <label for="newResBed">床号</label>
@@ -166,8 +168,9 @@
                   </div>
                   <div class="form-group col-3">
                     <label for="newResMoveInDate">入住日期</label>
-                    <input type="text" class="datepicker form-control" id="newResMoveInDate" data-provide="datepicker"
-                           data-date-format="yyyy-mm-dd" placeholder="选择日期" required v-model="newResident.moveInDate">
+                    <datepicker id="newResMoveInDate" format="yyyy-MM-dd" :language="language.zh"
+                                placeholder="选择日期" v-model="newResident.moveInDate" :required="true"
+                                :clear-button="true" :bootstrap-styling="true" :typeable="true"/>
                   </div>
                 </div>
                 <div class="form-row">
@@ -265,10 +268,13 @@
 <script>
 import $ from 'jquery'
 import LoginModal from '@/components/LoginModal'
+import Datepicker from 'vuejs-datepicker/dist/vuejs-datepicker.min'
+import * as lang from 'vuejs-datepicker/src/locale'
 
 export default {
   name: 'baseInfo',
   components: {
+    Datepicker,
     LoginModal
   },
   data () {
@@ -298,7 +304,8 @@ export default {
       dismissSecs: 5,
       dismissCountDown: 0,
       showDismissibleAlert: false,
-      hasClicked: false
+      hasClicked: false,
+      language: lang
     }
   },
   computed: {
@@ -396,7 +403,7 @@ export default {
       }
     },
     dateTrim (date) {
-      return date.substring(0, 10)
+      return this.$moment(date).format('YYYY-MM-DD')
     },
     getFile (event) {
       this.newResident.photo = event.target.files[0]
@@ -422,19 +429,20 @@ export default {
           let postData = {
             name: this.newResident.name,
             sex: this.newResident.sex,
-            dob: this.newResident.dob,
+            dob: this.dateTrim(this.newResident.dob),
             bed: this.newResident.bed,
             goverId: this.newResident.goverId,
             phone: this.newResident.phone,
             email: this.newResident.email,
             address: this.newResident.address,
             medicalHistory: this.newResident.medicalHistory,
-            moveInDate: this.newResident.moveInDate,
+            moveInDate: this.dateTrim(this.newResident.moveInDate),
             famName: this.newResident.famName,
             famPhone: this.newResident.famPhone,
             famEmail: this.newResident.famEmail,
             famAddress: this.newResident.famAddress
           }
+          console.log(postData)
           this.uploadStatus = '正在上传资料...'
           this.axios.post('http://localhost:8080/resident/add-resident', postData).then(response => {
             if (response.data === 100) {
@@ -451,6 +459,7 @@ export default {
                   this.newResident.phone = ''
                   this.newResident.email = ''
                   this.newResident.address = ''
+                  this.newResident.medicalHistory = ''
                   this.newResident.photo = ''
                   this.newResident.moveInDate = ''
                   this.newResident.famName = ''
@@ -488,6 +497,7 @@ export default {
       this.newResident.email = ''
       this.newResident.address = ''
       this.newResident.photo = ''
+      this.newResident.medicalHistory = ''
       this.newResident.moveInDate = ''
       this.newResident.famName = ''
       this.newResident.famPhone = ''

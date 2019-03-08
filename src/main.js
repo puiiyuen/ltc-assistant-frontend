@@ -7,18 +7,17 @@ import BootstrapVue from 'bootstrap-vue'
 import palette from './util/palette.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import Datepicker from 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min'
+import VueMoment from 'vue-moment'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.css'
 
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
 Vue.use(session)
 Vue.use(palette)
-Vue.use(Datepicker)
+Vue.use(VueMoment)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
