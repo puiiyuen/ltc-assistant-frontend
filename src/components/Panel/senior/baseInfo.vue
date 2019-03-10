@@ -3,12 +3,13 @@
     <div id="panel-title"><h5><strong>基本信息</strong></h5></div>
     <div id="function-bar">
       <div id="operation-bar">
+        <button class="btn btn-success" @click="getAllResidentInfo">全部住户</button>
         <button class="btn btn-primary" data-toggle="modal" data-target="#addResidentModal">添加住户</button>
       </div>
-      <form class="form-inline my-2 my-lg-0" id="search-bar">
+      <form class="form-inline my-2 my-lg-0" id="search-bar" @submit="searchResident">
         <label for="search-input" style="padding-right:15px">搜索住户:</label>
-        <input id="search-input" class="form-control mr-sm-2" type="search" placeholder="输入ID、姓名、床号" aria-label="Search"
-               required>
+        <input id="search-input" class="form-control mr-sm-2" type="search"
+               placeholder="输入ID、姓名、床号" aria-label="Search" required v-model="searchInput">
         <button class="btn btn-success my-2 my-sm-0" type="submit">搜索</button>
       </form>
     </div>
@@ -372,7 +373,8 @@ export default {
       dismissCountDown: 0,
       showDismissibleAlert: false,
       hasClicked: false,
-      language: lang
+      language: lang,
+      searchInput: ''
     }
   },
   computed: {
@@ -384,9 +386,7 @@ export default {
     isOnline () {
       if (this.$store.getters.getOnline) {
         $('#loginModal').modal('hide')
-        if (this.residents.length === 0) {
-          this.getAllResidentInfo()
-        }
+        this.getAllResidentInfo()
       }
     },
     dismissCountDown () {
@@ -400,6 +400,7 @@ export default {
       this.checkSession().then(response => {
         if (response) {
           this.axios.get('http://localhost:8080/resident/baseInfo').then(response => {
+            this.residents = []
             for (var i = 0; i < response.data.length; i++) {
               var temp = {
                 id: response.data[i].resId,
@@ -635,6 +636,35 @@ export default {
     },
     showAlert () {
       this.dismissCountDown = this.dismissSecs
+    },
+    searchResident (evt) {
+      evt.preventDefault()
+      this.checkSession().then(response => {
+        if (response) {
+          let searchContent = { 'search': this.searchInput }
+          this.axios.post('http://localhost:8080/resident/search', searchContent).then(response => {
+            this.residents = []
+            for (var i = 0; i < response.data.length; i++) {
+              var temp = {
+                id: response.data[i].resId,
+                name: response.data[i].name,
+                sex: this.sexCheck(response.data[i].sex),
+                dob: this.dateTrim(response.data[i].dob),
+                bed: response.data[i].numOfBed,
+                phone: response.data[i].phone,
+                egName: response.data[i].famName,
+                egPhone: response.data[i].famPhone
+              }
+              this.residents.push(temp)
+            }
+          }, response => {
+            console.log('search post failed')
+            console.log(response.data)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
     }
   },
   beforeMount () {
@@ -665,6 +695,10 @@ export default {
   #operation-bar {
     padding: 20px 0;
     float: left;
+  }
+
+  #operation-bar button{
+    margin-right: 5px;
   }
 
   #infoModal #medical-text {

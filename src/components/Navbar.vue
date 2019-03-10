@@ -37,7 +37,7 @@
         </span>
         <div class="dropdown-menu dropdown-menu-right" >
           <!--<router-link :to="{name: 'dashboard'}" class="dropdown-item" >个人中心 </router-link>-->
-          <a class="dropdown-item" @click="logout">注销</a>
+          <a class="dropdown-item" @click="logout">登出账户</a>
         </div>
       </div>
     </div>
