@@ -56,12 +56,6 @@ export default new Router({
           name: 'bill',
           component: () => import('./components/Panel/senior/bill'),
           meta: { requireAuth: true }
-        },
-        {// add resident
-          path: 'add-resident',
-          name: 'addResident',
-          component: () => import('./components/Panel/senior/addResident'),
-          meta: { requireAuth: true }
         }
       ]
     },
