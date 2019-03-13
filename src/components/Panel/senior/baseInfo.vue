@@ -30,7 +30,8 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(object,index) in residents" @click="getDetail(index)" id="main-table-tr">
+      <tr v-for="(object,index) in residents" @click="getDetail(index)" id="main-table-tr"
+          data-toggle="tooltip" title="点击查看详情">
         <th scope="row">{{index+1}}</th>
         <td v-for="value in object">
           {{value}}
@@ -282,7 +283,7 @@
               :show="dismissCountDown"
               dismissible
               fade
-              variant="warning"
+              variant="success"
               @dismissed="dismissCountDown=0"
               @dismiss-count-down="countDownChanged"
             >
@@ -369,7 +370,7 @@ export default {
       loading: true,
       loadingStatus: '加载中...',
       uploadStatus: '',
-      dismissSecs: 5,
+      dismissSecs: 3,
       dismissCountDown: 0,
       showDismissibleAlert: false,
       hasClicked: false,
@@ -491,8 +492,8 @@ export default {
       this.formFormat.name = this.newResident.name.length > 10
       this.formFormat.famName = this.newResident.famName.length > 10
       this.formFormat.sex = this.newResident.sex.length === 0
-      this.formFormat.dob = this.dateTrim(this.newResident.dob) === 'Invalid Date'
-      this.formFormat.moveInDate = this.dateTrim(this.newResident.moveInDate) === 'Invalid Date'
+      this.formFormat.dob = this.dateTrim(this.newResident.dob) === 'Invalid date'
+      this.formFormat.moveInDate = this.dateTrim(this.newResident.moveInDate) === 'Invalid date'
       let bedRex = /^[0-9]{1,5}$/
       this.formFormat.bed = !bedRex.test(this.newResident.bed)
       let goverIdRex = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/
@@ -561,24 +562,9 @@ export default {
                 console.log(response.data)
                 if (response.data === 100) {
                   this.uploadStatus = ''
-                  this.newResident.name = ''
-                  this.newResident.sex = ''
-                  this.newResident.dob = ''
-                  this.newResident.bed = ''
-                  this.newResident.goverId = ''
-                  this.newResident.phone = ''
-                  this.newResident.email = ''
-                  this.newResident.address = ''
-                  this.newResident.medicalHistory = ''
-                  this.newResident.photo = ''
-                  this.newResident.moveInDate = ''
-                  this.newResident.famName = ''
-                  this.newResident.famPhone = ''
-                  this.newResident.famEmail = ''
-                  this.newResident.famAddress = ''
+                  this.newResident = {}
                   this.showAlert()
                   this.hasClicked = false
-                  this.residents = []
                   this.getAllResidentInfo()
                 } else if (response.data === 200) {
                   this.uploadStatus = '上传失败请重试'
