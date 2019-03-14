@@ -81,10 +81,17 @@
                 <th scope="row" colspan="10">健康建议</th>
               </tr>
               <tr>
-                <td colspan="10" class="medical-text" v-show="!addingRecord" v-html="showSgn"></td>
-                <td colspan="10" v-show="addingRecord">
-                  <input type="text" class="form-control" v-model="newHealthRecord.suggestion">
-                </td>
+                <template v-if="modifying===-1">
+                  <td colspan="10" class="medical-text" v-show="!addingRecord" v-html="showSgn"></td>
+                  <td colspan="10" v-show="addingRecord">
+                    <input type="text" class="form-control" v-model="newHealthRecord.suggestion" placeholder="健康建议">
+                  </td>
+                </template>
+                <template v-if="modifying!==-1">
+                  <td colspan="10" v-show="modifyFlag[modifying]">
+                    <input type="text" class="form-control" v-model="modifyRecord.suggestion">
+                  </td>
+                </template>
               </tr>
               </tbody>
             </table>
@@ -127,9 +134,8 @@
                 </td>
               </tr>
               <!--record each line-->
-              <!--@click="showSuggestion(index)"-->
-              <!--data-toggle="tooltip" title="点击查看健康建议"-->
-              <tr v-for="(object,index) in reportDetail">
+              <tr v-for="(object,index) in reportDetail" @click="showSuggestion(index)"
+                  data-toggle="tooltip" title="点击查看健康建议">
                 <th scope="row">{{index+1}}</th>
                 <td v-for="value in object" v-show="!modifyFlag[index]">
                   {{value}}
@@ -328,6 +334,7 @@ export default {
                   recordDate: this.dateTimeTrim(response.data[i].recordDate)
                 }
                 this.modifyFlag.push(false)
+                this.modifying = -1
                 this.reportDetail.push(record)
                 this.reportSuggestion.push(response.data[i].suggestion)
               }
@@ -356,6 +363,9 @@ export default {
     },
     addSwitchOn () {
       this.addingRecord = true
+      if (this.modifying !== -1) {
+        this.modifySwitchOff(this.modifying)
+      }
       this.uploadStatus = ''
     },
     addSwitchOff () {
@@ -415,6 +425,7 @@ export default {
                       recordDate: this.dateTimeTrim(response.data[i].recordDate)
                     }
                     this.modifyFlag.push(false)
+                    this.modifying = -1
                     this.reportDetail.push(record)
                     this.reportSuggestion.push(response.data[i].suggestion)
                   }
@@ -445,7 +456,11 @@ export default {
       })
     },
     modifySwitchOn (index) {
-      if (this.modifying === -1) {
+      if (this.addingRecord) {
+        this.addSwitchOff()
+        this.modifying = index
+        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+      } else if (this.modifying === -1) {
         this.modifying = index
         this.$set(this.modifyFlag, index, !this.modifyFlag[index])
       } else {
@@ -453,10 +468,20 @@ export default {
         this.modifying = index
         this.$set(this.modifyFlag, index, !this.modifyFlag[index])
       }
+      this.modifyRecord.height = this.reportDetail[index].height
+      this.modifyRecord.weight = this.reportDetail[index].weight
+      this.modifyRecord.heartRate = this.reportDetail[index].heartRate
+      this.modifyRecord.bpSystolic = this.reportDetail[index].bpSystolic
+      this.modifyRecord.bpDiastolic = this.reportDetail[index].bpDiastolic
+      this.modifyRecord.bloodGlucose = this.reportDetail[index].bloodGlucose
+      this.modifyRecord.bloodLipids = this.reportDetail[index].bloodLipids
+      this.modifyRecord.uricAcid = this.reportDetail[index].uricAcid
+      this.modifyRecord.suggestion = this.reportSuggestion[index]
     },
     modifySwitchOff (index) {
       this.$set(this.modifyFlag, index, !this.modifyFlag[index])
       this.modifying = -1
+      this.modifyRecord = {}
     },
     searchResident (evt) {
       evt.preventDefault()
