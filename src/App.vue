@@ -20,7 +20,7 @@ export default {
   methods: {
   },
   created () {
-    this.axios.get('http://localhost:8080/session').then(response => {
+    this.axios.get(this.getAPI() + '/session').then(response => {
       if (response.data === 300) {
         console.log('App online')
         this.$store.commit('setUser')

@@ -17,6 +17,9 @@ export default {
       })
       return online
     }
+    Vue.prototype.getAPI = function () {
+      let api = 'http://localhost:8080'
+      return api
+    }
   }
-
 }

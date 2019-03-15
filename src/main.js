@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import session from './util/session'
+import util from './util/util'
 import BootstrapVue from 'bootstrap-vue'
 import palette from './util/palette.css'
 import axios from 'axios'
@@ -15,7 +15,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
-Vue.use(session)
+Vue.use(util)
 Vue.use(palette)
 Vue.use(VueMoment)
 
@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
 
 async function checkSession () {
   let isOnline = false
-  await axios.get('http://localhost:8080/session').then(response => {
+  await axios.get(this.getAPI() + '/session').then(response => {
     if (response.data === 300) {
       console.log('online ' + response.data)
       isOnline = true

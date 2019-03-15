@@ -68,7 +68,6 @@ export default {
       },
       activateStatus: '',
       show: true,
-      activateApi: 'http://localhost:8080/activate',
       hasClicked: false
     }
   },
@@ -125,7 +124,7 @@ export default {
         'password': this.form.password,
         'activateCode': this.form.activateCode }
       let statusCode = 200
-      await this.axios.post(this.activateApi, postData, { timeout: 15000 }).then(response => {
+      await this.axios.post(this.getAPI() + '/activate', postData, { timeout: 15000 }).then(response => {
         console.log(response.data)
         statusCode = response.data
       }, response => {

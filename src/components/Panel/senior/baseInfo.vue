@@ -400,7 +400,7 @@ export default {
     getAllResidentInfo () {
       this.checkSession().then(response => {
         if (response) {
-          this.axios.get('http://localhost:8080/resident/baseInfo').then(response => {
+          this.axios.get(this.getAPI() +'/resident/baseInfo').then(response => {
             this.residents = []
             for (var i = 0; i < response.data.length; i++) {
               var temp = {
@@ -429,7 +429,7 @@ export default {
         if (response) {
           $('#infoModal').modal('show')
           let postData = { resId: this.residents[index].id }
-          this.axios.post('http://localhost:8080/resident/detailInfo', postData, { timeout: 15000 }).then(response => {
+          this.axios.post(this.getAPI() +'/resident/detailInfo', postData, { timeout: 15000 }).then(response => {
             this.residentDetail = {
               id: response.data.resId,
               name: response.data.name,
@@ -555,10 +555,10 @@ export default {
           }
           postPhoto.append('goverId', this.newResident.goverId)
           this.uploadStatus = '正在上传资料...'
-          this.axios.post('http://localhost:8080/resident/add-resident', postData).then(response => {
+          this.axios.post(this.getAPI() +'/resident/add-resident', postData).then(response => {
             if (response.data === 100) {
               this.uploadStatus = '正在上传照片...'
-              this.axios.post('http://localhost:8080/resident/upload-photo', postPhoto).then(response => {
+              this.axios.post(this.getAPI() +'/resident/upload-photo', postPhoto).then(response => {
                 console.log(response.data)
                 if (response.data === 100) {
                   this.uploadStatus = ''
@@ -628,7 +628,7 @@ export default {
       this.checkSession().then(response => {
         if (response) {
           let searchContent = { 'search': this.searchInput }
-          this.axios.post('http://localhost:8080/resident/search', searchContent).then(response => {
+          this.axios.post(this.getAPI() +'/resident/search', searchContent).then(response => {
             this.residents = []
             for (var i = 0; i < response.data.length; i++) {
               var temp = {

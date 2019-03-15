@@ -273,7 +273,7 @@ export default {
     getAllHealthInfo () {
       this.checkSession().then(response => {
         if (response) {
-          this.axios.get('http://localhost:8080/health/base-info').then(response => {
+          this.axios.get(this.getAPI() + '/health/base-info').then(response => {
             this.healthReport = []
             for (var i = 0; i < response.data.length; i++) {
               var temp = {
@@ -305,7 +305,7 @@ export default {
         if (response) {
           $('#infoModal').modal('show')
           let postData = { resId: this.healthReport[index].id }
-          this.axios.post('http://localhost:8080/health/report-detail', postData, { timeout: 15000 }).then(response => {
+          this.axios.post(this.getAPI() + '/health/report-detail', postData, { timeout: 15000 }).then(response => {
             this.reportDetail = []
             this.modifyFlag = []
             this.residentDetail = {
@@ -398,13 +398,13 @@ export default {
             suggestion: this.newHealthRecord.suggestion
           }
           this.uploadStatus = '正在上传记录...'
-          this.axios.post('http://localhost:8080/health/add-record', postData).then(response => {
+          this.axios.post(this.getAPI() + '/health/add-record', postData).then(response => {
             if (response.data === 100) {
               this.uploadStatus = '添加成功'
               this.newHealthRecord = {}
               this.addingRecord = false
               let refreshId = { resId: this.residentDetail.id }
-              this.axios.post('http://localhost:8080/health/report-detail',
+              this.axios.post(this.getAPI() + '/health/report-detail',
                 refreshId, { timeout: 15000 }).then(response => {
                 this.reportDetail = []
                 for (var i = 0; i < response.data.length; i++) {
@@ -488,7 +488,7 @@ export default {
       this.checkSession().then(response => {
         if (response) {
           let searchContent = { 'search': this.searchInput }
-          this.axios.post('http://localhost:8080/health/search', searchContent).then(response => {
+          this.axios.post(this.getAPI() + '/health/search', searchContent).then(response => {
             this.healthReport = []
             for (var i = 0; i < response.data.length; i++) {
               var temp = {
@@ -514,40 +514,7 @@ export default {
       })
     },
     checkFormat () {
-      this.formFormat.name = this.newResident.name.length > 10
-      this.formFormat.famName = this.newResident.famName.length > 10
-      this.formFormat.sex = this.newResident.sex.length === 0
-      this.formFormat.dob = this.dateTrim(this.newResident.dob) === 'Invalid Date'
-      this.formFormat.moveInDate = this.dateTrim(this.newResident.moveInDate) === 'Invalid Date'
-      let bedRex = /^[0-9]{1,5}$/
-      this.formFormat.bed = !bedRex.test(this.newResident.bed)
-      let goverIdRex = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/
-      this.formFormat.goverId = !goverIdRex.test(this.newResident.goverId)
-      let phoneRex = /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/
-      if (this.newResident.phone.length === 0) {
-        this.formFormat.phone = false
-      } else {
-        this.formFormat.phone = !phoneRex.test(this.newResident.phone)
-      }
-      this.formFormat.famPhone = !phoneRex.test(this.newResident.famPhone)
-      let emailRex = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
-      if (this.newResident.email.length === 0) {
-        this.formFormat.email = false
-      } else {
-        this.formFormat.email = !emailRex.test(this.newResident.email)
-      }
-      if (this.newResident.famEmail.length === 0) {
-        this.formFormat.famEmail = false
-      } else {
-        this.formFormat.famEmail = !emailRex.test(this.newResident.famEmail)
-      }
-      this.formFormat.address = this.newResident.address.length > 100
-      this.formFormat.famAddress = this.newResident.famAddress.length > 100
-      this.formFormat.medicalHistory = this.newResident.medicalHistory.length > 100
-      return this.formFormat.name || this.formFormat.sex || this.formFormat.dob || this.formFormat.bed ||
-        this.formFormat.goverId || this.formFormat.phone || this.formFormat.email || this.formFormat.address ||
-        this.formFormat.medicalHistory || this.formFormat.moveInDate || this.formFormat.famName ||
-        this.formFormat.famPhone || this.formFormat.famEmail || this.formFormat.famAddress
+
     },
     sexCheck (sex) {
       if (sex === 'MALE') {
