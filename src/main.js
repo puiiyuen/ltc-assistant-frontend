@@ -33,7 +33,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
     try {
       checkSession().then(response => {
-        if (response === true) { // 获取当前是否online
+        if (response) { // 获取当前是否online
           next()
         } else {
           next({
@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
 
 async function checkSession () {
   let isOnline = false
-  await axios.get(this.getAPI() + '/session').then(response => {
+  await axios.get(Vue.prototype.getAPI() + '/session').then(response => {
     if (response.data === 300) {
       console.log('online ' + response.data)
       isOnline = true

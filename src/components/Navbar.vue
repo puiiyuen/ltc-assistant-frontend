@@ -36,7 +36,6 @@
           {{username}}
         </span>
         <div class="dropdown-menu dropdown-menu-right" >
-          <!--<router-link :to="{name: 'dashboard'}" class="dropdown-item" >个人中心 </router-link>-->
           <a class="dropdown-item" @click="logout">登出账户</a>
         </div>
       </div>
@@ -63,7 +62,7 @@ export default {
   },
   methods: {
     logout () {
-      this.axios.get('http://localhost:8080/logout').then(response => {
+      this.axios.get(this.getAPI() + '/logout').then(response => {
         if (response.data === 100) {
           this.$store.commit('setDefaultUser')
           console.log('Logout Successful')

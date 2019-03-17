@@ -108,7 +108,6 @@ export default {
       let postData = { 'userId': this.form.userId, 'password': this.form.password }
       let statusCode = 200
       await this.axios.post(this.getAPI() + '/login', postData, { timeout: 15000 }).then(response => {
-        console.log(response.data)
         statusCode = response.data
       }, response => {
         if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
@@ -121,7 +120,7 @@ export default {
       return statusCode
     },
     fetchData () {
-      this.axios.get(this.api + 'user').then(response => {
+      this.axios.get(this.getAPI() + '/user').then(response => {
         localStorage.setItem('user', JSON.stringify(response.data))
         vuex.commit('setUser')
       }, response => {

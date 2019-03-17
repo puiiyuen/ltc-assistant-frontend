@@ -2,7 +2,7 @@ export default {
   install (Vue) {
     Vue.prototype.checkSession = async function () {
       let online = false
-      await this.axios.get('http://localhost:8080/session').then(response => {
+      await this.axios.get(Vue.prototype.getAPI() + '/session').then(response => {
         if (response.data === 400) {
           this.$store.commit('setDefaultUser')
         }
@@ -18,7 +18,10 @@ export default {
       return online
     }
     Vue.prototype.getAPI = function () {
+      // test
       let api = 'http://localhost:8080'
+      // live
+      // let api = ''
       return api
     }
   }

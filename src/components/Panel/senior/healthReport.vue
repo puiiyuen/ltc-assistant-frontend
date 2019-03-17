@@ -6,7 +6,7 @@
         <button class="btn btn-success" @click="getAllHealthInfo">全部住户</button>
       </div>
       <!--@submit="searchResident"-->
-      <form class="form-inline my-2 my-lg-0" id="search-bar">
+      <form class="form-inline my-2 my-lg-0" id="search-bar" @submit="searchHealthReport">
         <label for="search-input" style="padding-right:15px">搜索住户:</label>
         <input id="search-input" class="form-control mr-sm-2" type="search"
                placeholder="输入ID、姓名、床号" aria-label="Search" required v-model="searchInput">
@@ -97,7 +97,7 @@
             </table>
             <button class="btn btn-primary btn-sm" @click="addSwitchOn">添加记录</button>
             {{reportStatus}}
-            <table class="table table-hover table-responsive-lg" id="history-record">
+            <table class="table table-hover table-responsive-lg table-sm" id="history-record">
               <thead>
               <tr>
                 <th scope="col">#</th>
@@ -125,12 +125,12 @@
                 <td><input type="text" class="form-control" v-model="newHealthRecord.bloodGlucose"></td>
                 <td><input type="text" class="form-control" v-model="newHealthRecord.bloodLipids"></td>
                 <td><input type="text" class="form-control" v-model="newHealthRecord.uricAcid"></td>
-                <td>{{uploadStatus}}</td>
+                <td class="status-info">{{uploadStatus}}</td>
                 <td>
                   <button class="btn btn-primary btn-sm" @click="submitNewRecord"
                           :class="{disabled:hasClicked}">提交</button>
                   <button class="btn btn-danger btn-sm" @click="addSwitchOff"
-                          v-show="addingRecord" :class="{disabled:hasClicked}">取消</button>
+                          :class="{disabled:hasClicked}">取消</button>
                 </td>
               </tr>
               <!--record each line-->
@@ -152,7 +152,7 @@
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.bloodGlucose"></td>
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.bloodLipids"></td>
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.uricAcid"></td>
-                <td v-show="modifyFlag[index]">{{uploadStatus}}</td>
+                <td v-show="modifyFlag[index]" class="status-info">{{uploadStatus}}</td>
                 <td v-show="modifyFlag[index]">
                   <button class="btn btn-primary btn-sm">提交</button>
                   <button class="btn btn-danger btn-sm" @click="modifySwitchOff(index)">取消</button>
@@ -232,23 +232,6 @@ export default {
       },
       recordFormat: {},
       residentDetail: {},
-      formFormat: {
-        name: false,
-        sex: false,
-        dob: false,
-        bed: false,
-        goverId: false,
-        phone: false,
-        email: false,
-        address: false,
-        medicalHistory: false,
-        photo: false,
-        moveInDate: false,
-        famName: false,
-        famPhone: false,
-        famEmail: false,
-        famAddress: false
-      },
       loading: true,
       loadingStatus: '加载中...',
       uploadStatus: '',
@@ -308,6 +291,7 @@ export default {
           this.axios.post(this.getAPI() + '/health/report-detail', postData, { timeout: 15000 }).then(response => {
             this.reportDetail = []
             this.modifyFlag = []
+            this.reportSuggestion = []
             this.residentDetail = {
               id: response.data[0].resId,
               name: response.data[0].name,
@@ -357,6 +341,7 @@ export default {
     showSuggestion (index) {
       this.showSgn = this.reportSuggestion[index] + '<br>报告时间：' + this.reportDetail[index].recordDate
     },
+    // click from table
     addRecord (index) {
       this.getDetail(index)
       this.addSwitchOn()
@@ -403,10 +388,13 @@ export default {
               this.uploadStatus = '添加成功'
               this.newHealthRecord = {}
               this.addingRecord = false
+              this.hasClicked = false
               let refreshId = { resId: this.residentDetail.id }
               this.axios.post(this.getAPI() + '/health/report-detail',
                 refreshId, { timeout: 15000 }).then(response => {
                 this.reportDetail = []
+                this.modifyFlag = []
+                this.reportSuggestion = []
                 for (var i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate === null) {
                     this.reportStatus = '暂无检查记录'
@@ -428,6 +416,7 @@ export default {
                     this.modifying = -1
                     this.reportDetail.push(record)
                     this.reportSuggestion.push(response.data[i].suggestion)
+                    this.uploadStatus = ''
                   }
                 }
               }, response => {
@@ -483,7 +472,7 @@ export default {
       this.modifying = -1
       this.modifyRecord = {}
     },
-    searchResident (evt) {
+    searchHealthReport (evt) {
       evt.preventDefault()
       this.checkSession().then(response => {
         if (response) {

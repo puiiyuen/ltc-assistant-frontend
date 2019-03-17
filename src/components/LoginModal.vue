@@ -120,7 +120,7 @@ export default {
       return statusCode
     },
     fetchData () {
-      this.axios.get(this.api + 'user').then(response => {
+      this.axios.get(this.getAPI() + '/user').then(response => {
         localStorage.setItem('user', JSON.stringify(response.data))
         vuex.commit('setUser')
       }, response => {
