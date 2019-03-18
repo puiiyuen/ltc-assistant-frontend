@@ -215,8 +215,7 @@
                   <tbody>
                   <tr v-show="addingPaymentRecord">
                     <th scope="row">新</th>
-                    <td><input type="text" class="form-control" v-model="newPaymentRecord.amount"
-                               :class="{'is-invalid':!paymentCheckFormat(newPaymentRecord)}"></td>
+                    <td><input type="text" class="form-control" v-model="newPaymentRecord.paid"></td>
                     <td class="status-info" colspan="2">{{connectStatus}}</td>
                     <td>
                       <button class="btn btn-primary btn-sm" @click="submitNewPaymentRecord"
@@ -240,8 +239,7 @@
                     </template>
                     <template v-if="paymentModifyFlag[index]">
                       <td>
-                        <input type="text" class="form-control" v-model="modifyPaymentRecord.paid"
-                               :class="{'is-invalid':!paymentCheckFormat(modifyPaymentRecord)}">
+                        <input type="text" class="form-control" v-model="modifyPaymentRecord.paid">
                       </td>
                       <td colspan="2" class="status-info">{{connectStatus}}</td>
                       <td>
@@ -336,8 +334,8 @@ export default {
       currentResident: -1,
       billList: [],
       billNPayment: {
-        totalBill: '',
-        totalPaid: ''
+        totalBill: 0,
+        totalPaid: 0
       },
       billDetail: [],
       billId: [],
@@ -346,11 +344,11 @@ export default {
       recordLoadingStatus: '',
       newBillRecord: {
         item: '',
-        amount: ''
+        amount: 0
       },
       addingBillRecord: false,
       newPaymentRecord: {
-        paid: ''
+        paid: 0
       },
       addingPaymentRecord: false,
       billModifyFlag: [],
@@ -441,6 +439,7 @@ export default {
             postData, { timeout: 15000 }).then(response => {
             this.billDetail = []
             this.billModifyFlag = []
+            this.billId = []
             this.residentDetail = {
               id: response.data[0].resId,
               name: response.data[0].name,
@@ -477,6 +476,7 @@ export default {
           this.axios.post(this.getAPI() + '/payment/detail', postData, { timeout: 15000 }).then(response => {
             this.paymentDetail = []
             this.paymentModifyFlag = []
+            this.paymentId = []
             for (let i = 0; i < response.data.length; i++) {
               if (response.data[i].recordDate == null) {
                 this.recordLoadingStatus = '暂无记录'
@@ -586,6 +586,7 @@ export default {
       }
       this.modifyBillRecord.item = this.billDetail[index].item
       this.modifyBillRecord.amount = this.billDetail[index].amount
+      this.connectStatus = ''
     },
     billModifySwitchOff (index) {
       this.$set(this.billModifyFlag, index, !this.billModifyFlag[index])
@@ -615,6 +616,7 @@ export default {
         this.$set(this.paymentModifyFlag, index, !this.paymentModifyFlag[index])
       }
       this.modifyPaymentRecord.paid = this.paymentDetail[index].paid
+      this.connectStatus = ''
     },
     paymentModifySwitchOff (index) {
       this.$set(this.paymentModifyFlag, index, !this.paymentModifyFlag[index])
@@ -629,6 +631,7 @@ export default {
     },
     billDeleteSwitchOff () {
       this.billDeleting = -1
+      $('#delConfirmModal').modal('hide')
     },
     paymentDeleteSwitchOn (index) {
       $('#delConfirmModal').modal({
@@ -638,6 +641,7 @@ export default {
     },
     paymentDeleteSwitchOff () {
       this.paymentDeleting = -1
+      $('#delConfirmModal').modal('hide')
     },
     submitNewBillRecord () {
       if (this.hasClicked) {
@@ -659,14 +663,13 @@ export default {
           this.axios.post(this.getAPI() + '/bill/add-record', postData).then(response => {
             if (response.data === 100) {
               this.connectStatus = '添加成功'
-              this.newBillRecord = {}
               this.addingBillRecord = false
-              this.hasClicked = false
               let refreshId = { resId: this.residentDetail.id }
               this.axios.post(this.getAPI() + '/bill/detail',
                 refreshId, { timeout: 15000 }).then(response => {
                 this.billDetail = []
                 this.billModifyFlag = []
+                this.billId = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate === null) {
                     this.recordLoadingStatus = '暂无检查记录'
@@ -686,10 +689,9 @@ export default {
                 }
                 this.loadingStatus = '加载完成'
                 this.loading = false
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                this.billNPayment.totalBill += parseInt(this.newBillRecord.amount)
+                this.showAlert(true)
+                this.newBillRecord = {}
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   this.loadingStatus = '加载超时，请重试'
@@ -701,10 +703,8 @@ export default {
               this.connectStatus = ''
             } else if (response.data === 200) {
               this.connectStatus = '添加失败请重试'
-              this.hasClicked = false
             } else if (response.data === -999) {
               this.connectStatus = '服务器错误，请稍后尝试'
-              this.hasClicked = false
             }
           }, response => {
             console.log('post info failed')
@@ -715,6 +715,7 @@ export default {
           $('#loginModal').modal('show')
         }
       })
+      this.hasClicked = false
     },
     submitModBillRecord (index) {
       if (this.hasClicked) {
@@ -730,8 +731,8 @@ export default {
           this.connectStatus = '正在修改'
           let postData = {
             resId: this.residentDetail.id,
-            item: this.modifyPaymentRecord.item,
-            amount: this.modifyPaymentRecord.amount,
+            item: this.modifyBillRecord.item,
+            amount: this.modifyBillRecord.amount,
             billId: this.billId[index]
           }
           this.axios.post(this.getAPI() + '/bill/modify-bill',
@@ -742,8 +743,9 @@ export default {
               let refreshId = { resId: this.residentDetail.id }
               this.axios.post(this.getAPI() + '/bill/detail',
                 refreshId, { timeout: 15000 }).then(response => {
-                this.billDeleting = []
                 this.billModifyFlag = []
+                this.billDetail = []
+                this.billId = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate == null) {
                     this.recordLoadingStatus = '暂无记录'
@@ -759,10 +761,8 @@ export default {
                     this.billId.push(response.data[i].billId)
                   }
                 }
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                this.connectStatus = ''
+                // ！！缺少总额数据更新！！
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   console.log('加载超时')
@@ -820,6 +820,7 @@ export default {
                 refreshId, { timeout: 15000 }).then(response => {
                 this.billDetail = []
                 this.billModifyFlag = []
+                this.billId = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate == null) {
                     this.recordLoadingStatus = '暂无记录'
@@ -835,10 +836,7 @@ export default {
                     this.billId.push(response.data[i].billId)
                   }
                 }
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                // ！！缺少总额数据更新！！
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   console.log('加载超时')
@@ -894,16 +892,19 @@ export default {
             platform: 'CONSOLE'
           }
           this.connectStatus = '正在上传记录...'
-          this.axios.post(this.getAPI() + '/payment/add-record', postData).then(response => {
+          this.axios.post(this.getAPI() + '/payment/add-record',
+            postData, { timeout: 15000 }).then(response => {
             if (response.data === 100) {
               this.connectStatus = '添加成功'
               this.newPaymentRecord = {}
               this.addingPaymentRecord = false
+              this.showAlert(true)
               let refreshId = { resId: this.residentDetail.id }
               this.axios.post(this.getAPI() + '/payment/detail',
                 refreshId, { timeout: 15000 }).then(response => {
                 this.paymentDetail = []
                 this.paymentModifyFlag = []
+                this.paymentId = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate === null) {
                     this.recordLoadingStatus = '暂无检查记录'
@@ -922,10 +923,7 @@ export default {
                 }
                 this.loadingStatus = '加载完成'
                 this.loading = false
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                // 缺少更新总额数据
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   this.loadingStatus = '加载超时，请重试'
@@ -937,10 +935,14 @@ export default {
               this.connectStatus = ''
             } else if (response.data === 200) {
               this.connectStatus = '添加失败请重试'
+              this.showAlert(false)
             } else if (response.data === -999) {
               this.connectStatus = '服务器错误，请稍后尝试'
+              this.showAlert(false)
             }
           }, response => {
+            this.connectStatus = '添加失败请重试'
+            this.showAlert(false)
             console.log('post info failed')
             console.log(response)
           })
@@ -974,8 +976,9 @@ export default {
               let refreshId = { resId: this.residentDetail.id }
               this.axios.post(this.getAPI() + '/payment/detail',
                 refreshId, { timeout: 15000 }).then(response => {
-                this.paymentDeleting = []
                 this.paymentModifyFlag = []
+                this.paymentId = []
+                this.paymentDetail = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate == null) {
                     this.recordLoadingStatus = '暂无记录'
@@ -991,10 +994,8 @@ export default {
                     this.paymentId.push(response.data[i].paymentId)
                   }
                 }
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                this.connectStatus = ''
+                // 缺少更新总额数据！！！！
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   console.log('加载超时')
@@ -1014,14 +1015,13 @@ export default {
           }, response => {
             if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
               this.connectStatus = '加载超时，请重试'
-              this.connectStatus = ''
               this.showAlert(false)
             } else {
-              this.connectStatus = ''
               this.showAlert(false)
               console.log('post payment failed')
               console.log(response)
             }
+            this.connectStatus = ''
           })
         } else {
           $('#loginModal').modal('show')
@@ -1052,6 +1052,7 @@ export default {
                 refreshId, { timeout: 15000 }).then(response => {
                 this.paymentDetail = []
                 this.paymentModifyFlag = []
+                this.paymentId = []
                 for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate == null) {
                     this.recordLoadingStatus = '暂无记录'
@@ -1067,10 +1068,7 @@ export default {
                     this.paymentId.push(response.data[i].paymentId)
                   }
                 }
-                // ！！开销过大！！
-                this.getAllBillInfo()
-                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
-                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+                // ！！缺少总额数据更新！！
               }, response => {
                 if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
                   console.log('加载超时')
@@ -1146,7 +1144,7 @@ export default {
       return paidRex.test(obj.paid)
     },
     billCheckFormat (obj) {
-      if (obj.item == null || obj.amout == null) {
+      if (obj.item == null || obj.amount == null) {
         return false
       } else {
         let amountRex = /^[0-9]+(\.[0-9]{1,2})?$/
