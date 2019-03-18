@@ -43,7 +43,7 @@
     <!--detail modal-->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="infoModalLabel">详细信息</h5>
@@ -113,7 +113,7 @@
     <!--add resident modal-->
     <div class="modal fade" id="addResidentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addResidentModalLabel">添加住户</h5>
@@ -300,7 +300,7 @@
     <!--login modal-->
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-md" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="loginModalLabel">会话超时</h5>

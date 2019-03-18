@@ -52,7 +52,7 @@
     <!--detail modal-->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable  modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="infoModalLabel">账单详情</h5>
@@ -85,7 +85,8 @@
               </tbody>
             </table>
             <div class="row">
-              <div class="col-2">
+              <div class="col-4">
+                <button class="btn btn-success btn-sm" @click="getDetail(currentResident)">全部记录</button>
                 <button class="btn btn-primary btn-sm" @click="addBillSwitchOn">添加账单</button>
                 <button class="btn btn-warning btn-sm" @click="addPaymentSwitchOn">支付账单</button>
               </div>
@@ -109,6 +110,38 @@
               <div class="col-2">{{recordLoadingStatus}}</div>
             </div>
             <div class="row">
+              <div class="col-4"></div>
+              <div class="col-4">
+                <template v-if="operationSuccess">
+                  <b-alert
+                    :show="dismissCountDown"
+                    dismissible
+                    fade
+                    variant="success"
+                    @dismissed="dismissCountDown=0"
+                    @dismiss-count-down="countDownChanged"
+                  >
+                    操作成功
+                  </b-alert>
+                </template>
+                <template v-if="!operationSuccess">
+                  <b-alert
+                    :show="dismissCountDown"
+                    dismissible
+                    fade
+                    variant="danger"
+                    @dismissed="dismissCountDown=0"
+                    @dismiss-count-down="countDownChanged"
+                  >
+                    操作失败，请稍后重试
+                  </b-alert>
+                </template>
+              </div>
+              <div class="col-4"></div>
+            </div>
+
+            <div class="row">
+              <!--bill-->
               <div class="col-6">
                 <table class="table table-hover table-responsive-lg table-sm history-record">
                   <thead>
@@ -126,7 +159,7 @@
                     <th scope="row">新</th>
                     <td><input type="text" class="form-control" v-model="newBillRecord.item"></td>
                     <td><input type="text" class="form-control" v-model="newBillRecord.amount"></td>
-                    <td class="status-info">{{uploadStatus}}</td>
+                    <td class="status-info">{{connectStatus}}</td>
                     <td>
                       <button class="btn btn-primary btn-sm" @click="submitNewBillRecord"
                               :class="{disabled:hasClicked}">提交
@@ -145,7 +178,7 @@
                       </td>
                       <td>
                         <button class="btn btn-warning btn-sm" @click="billModifySwitchOn(index)">修改</button>
-                        <button class="btn btn-danger btn-sm">删除</button>
+                        <button class="btn btn-danger btn-sm" @click="billDeleteSwitchOn(index)">删除</button>
                       </td>
                     </template>
                     <template v-if="billModifyFlag[index]">
@@ -155,16 +188,19 @@
                       <td>
                         <input type="text" class="form-control" v-model="modifyBillRecord.amount">
                       </td>
-                      <td class="status-info">{{uploadStatus}}</td>
+                      <td class="status-info">{{connectStatus}}</td>
                       <td>
-                        <button class="btn btn-primary btn-sm">提交</button>
-                        <button class="btn btn-danger btn-sm" @click="billModifySwitchOff(index)">取消</button>
+                        <button class="btn btn-primary btn-sm" @click="submitModBillRecord (index)"
+                                :class="{disabled:hasClicked}">提交</button>
+                        <button class="btn btn-danger btn-sm" @click="billModifySwitchOff(index)"
+                                :class="{disabled:hasClicked}">取消</button>
                       </td>
                     </template>
                   </tr>
                   </tbody>
                 </table>
               </div>
+              <!--payment-->
               <div class="col-6">
                 <table class="table table-hover table-responsive-lg table-sm history-record">
                   <thead>
@@ -179,8 +215,9 @@
                   <tbody>
                   <tr v-show="addingPaymentRecord">
                     <th scope="row">新</th>
-                    <td><input type="text" class="form-control" v-model="newPaymentRecord.amount"></td>
-                    <td class="status-info" colspan="2">{{uploadStatus}}</td>
+                    <td><input type="text" class="form-control" v-model="newPaymentRecord.amount"
+                               :class="{'is-invalid':!paymentCheckFormat(newPaymentRecord)}"></td>
+                    <td class="status-info" colspan="2">{{connectStatus}}</td>
                     <td>
                       <button class="btn btn-primary btn-sm" @click="submitNewPaymentRecord"
                               :class="{disabled:hasClicked}">提交
@@ -198,17 +235,20 @@
                       </td>
                       <td>
                         <button class="btn btn-warning btn-sm" @click="paymentModifySwitchOn(index)">修改</button>
-                        <button class="btn btn-danger btn-sm">删除</button>
+                        <button class="btn btn-danger btn-sm" @click="paymentDeleteSwitchOn(index)">删除</button>
                       </td>
                     </template>
                     <template v-if="paymentModifyFlag[index]">
                       <td>
-                        <input type="text" class="form-control" v-model="modifyPaymentRecord.paid">
+                        <input type="text" class="form-control" v-model="modifyPaymentRecord.paid"
+                               :class="{'is-invalid':!paymentCheckFormat(modifyPaymentRecord)}">
                       </td>
-                      <td colspan="2" class="status-info">{{uploadStatus}}</td>
+                      <td colspan="2" class="status-info">{{connectStatus}}</td>
                       <td>
-                        <button class="btn btn-primary btn-sm">提交</button>
-                        <button class="btn btn-danger btn-sm" @click="paymentModifySwitchOff(index)">取消</button>
+                        <button class="btn btn-primary btn-sm" @click="submitModPaymentRecord (index)"
+                                :class="{disabled:hasClicked}">提交</button>
+                        <button class="btn btn-danger btn-sm" @click="paymentModifySwitchOff(index)"
+                                :class="{disabled:hasClicked}">取消</button>
                       </td>
                     </template>
                   </tr>
@@ -228,7 +268,7 @@
     <!--login modal-->
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-md" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="loginModalLabel">会话超时</h5>
@@ -238,6 +278,39 @@
           </div>
           <div id="loginModalBody" class="modal-body">
             <LoginModal/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--delete confirm modal-->
+    <div class="modal" tabindex="-1" role="dialog" id="delConfirmModal">
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">删除确认</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>确认删除记录？该操作不可恢复</p>
+            <div class="status-info">{{connectStatus}}</div>
+          </div>
+          <div class="modal-footer">
+            <template v-if="billDeleting>-1">
+              <button type="button" class="btn btn-danger" @click="submitDelBillRecord()"
+                      :class="{disabled:hasClicked}">确定</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                      @click="billDeleteSwitchOff()" :class="{disabled:hasClicked}">取消</button>
+            </template>
+            <template v-if="paymentDeleting>-1">
+              <button type="button" class="btn btn-danger" @click="submitDelPaymentRecord()"
+                      :class="{disabled:hasClicked}">确定</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                      @click="paymentDeleteSwitchOff()" :class="{disabled:hasClicked}">取消</button>
+            </template>
+
           </div>
         </div>
       </div>
@@ -260,13 +333,16 @@ export default {
   },
   data () {
     return {
+      currentResident: -1,
       billList: [],
       billNPayment: {
         totalBill: '',
         totalPaid: ''
       },
       billDetail: [],
+      billId: [],
       paymentDetail: [],
+      paymentId: [],
       recordLoadingStatus: '',
       newBillRecord: {
         item: '',
@@ -274,7 +350,7 @@ export default {
       },
       addingBillRecord: false,
       newPaymentRecord: {
-        amount: ''
+        paid: ''
       },
       addingPaymentRecord: false,
       billModifyFlag: [],
@@ -287,14 +363,26 @@ export default {
       modifyPaymentRecord: {
         paid: ''
       },
-      recordFormat: {},
+      billDeleting: -1,
+      paymentDeleting: -1,
+      billRecordFormat: {
+        item: false,
+        amount: false
+      },
+      paymentRecordFormat: {
+        paid: false
+      },
       residentDetail: {},
       loading: true,
       loadingStatus: '加载中...',
-      uploadStatus: '',
+      connectStatus: '',
       hasClicked: false,
       searchInput: '',
-      language: lang
+      language: lang,
+      operationSuccess: false,
+      dismissSecs: 3,
+      dismissCountDown: 0,
+      showDismissibleAlert: false
     }
   },
   computed: {
@@ -333,7 +421,7 @@ export default {
             }
           }, response => {
             console.log('Get Failed')
-            console.log(response.data)
+            console.log(response)
           })
         } else {
           $('#loginModal').modal('show')
@@ -344,11 +432,13 @@ export default {
       this.addBillSwitchOff()
       this.addPaymentSwitchOff()
       this.recordLoadingStatus = ''
+      this.currentResident = index
       this.checkSession().then(response => {
         if (response) {
           $('#infoModal').modal('show')
           let postData = { resId: this.billList[index].id }
-          this.axios.post(this.getAPI() + '/bill/bill-detail', postData, { timeout: 15000 }).then(response => {
+          this.axios.post(this.getAPI() + '/bill/detail',
+            postData, { timeout: 15000 }).then(response => {
             this.billDetail = []
             this.billModifyFlag = []
             this.residentDetail = {
@@ -369,6 +459,7 @@ export default {
                 this.billModifyFlag.push(false)
                 this.modifying = -1
                 this.billDetail.push(record)
+                this.billId.push(response.data[i].billId)
               }
             }
             this.loadingStatus = '加载完成'
@@ -383,7 +474,7 @@ export default {
               console.log(response)
             }
           })
-          this.axios.post(this.getAPI() + '/payment/payment-detail', postData, { timeout: 15000 }).then(response => {
+          this.axios.post(this.getAPI() + '/payment/detail', postData, { timeout: 15000 }).then(response => {
             this.paymentDetail = []
             this.paymentModifyFlag = []
             for (let i = 0; i < response.data.length; i++) {
@@ -398,6 +489,7 @@ export default {
                 }
                 this.paymentModifyFlag.push(false)
                 this.paymentDetail.push(record)
+                this.paymentId.push(response.data[i].paymentId)
               }
             }
           }, response => {
@@ -432,7 +524,7 @@ export default {
       if (this.addingPaymentRecord) {
         this.addPaymentSwitchOff()
       }
-      this.uploadStatus = ''
+      this.connectStatus = ''
     },
     addBillSwitchOff () {
       if (this.hasClicked) {
@@ -440,6 +532,7 @@ export default {
       }
       this.addingBillRecord = false
       this.newBillRecord = {}
+      this.connectStatus = ''
     },
     // click from table
     addPaymentRecord (index) {
@@ -459,7 +552,7 @@ export default {
       if (this.addingBillRecord) {
         this.addBillSwitchOff()
       }
-      this.uploadStatus = ''
+      this.connectStatus = ''
     },
     addPaymentSwitchOff () {
       if (this.hasClicked) {
@@ -467,73 +560,7 @@ export default {
       }
       this.addingPaymentRecord = false
       this.newPaymentRecord = {}
-    },
-    submitNewBillRecord () {
-      if (this.hasClicked) {
-        return
-      }
-      if (this.checkFormat()) {
-        return
-      }
-      this.hasClicked = true
-      this.checkSession().then(response => {
-        if (response) {
-          let postData = {
-            resId: this.residentDetail.id,
-            item: this.newBillRecord.item,
-            amount: this.newBillRecord.amount
-          }
-          this.uploadStatus = '正在上传记录...'
-          this.axios.post(this.getAPI() + '/bill/add-record', postData).then(response => {
-            if (response.data === 100) {
-              this.uploadStatus = '添加成功'
-              this.newBillRecord = {}
-              this.addingBillRecord = false
-              let refreshId = { resId: this.residentDetail.id }
-              this.axios.post(this.getAPI() + '/health/report-detail',
-                refreshId, { timeout: 15000 }).then(response => {
-                this.billDetail = []
-                this.billModifyFlag = []
-                for (let i = 0; i < response.data.length; i++) {
-                  if (response.data[i].recordDate === null) {
-                    this.recordLoadingStatus = '暂无检查记录'
-                    break
-                  } else {
-                    this.recordLoadingStatus = ''
-                    let record = {
-                      item: response.data[i].item,
-                      amount: response.data[i].amount,
-                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
-                    }
-                    this.billModifyFlag.push(false)
-                    this.modifying = -1
-                    this.billDetail.push(record)
-                  }
-                }
-              }, response => {
-                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
-                  this.loadingStatus = '加载超时，请重试'
-                } else {
-                  console.log('post failed')
-                  console.log(response)
-                }
-              })
-            } else if (response.data === 200) {
-              this.uploadStatus = '添加失败请重试'
-              this.hasClicked = false
-            } else if (response.data === -999) {
-              this.uploadStatus = '服务器错误，请稍后尝试'
-              this.hasClicked = false
-            }
-          }, response => {
-            console.log('post info failed')
-            console.log(response.data)
-          })
-        } else {
-          this.hasClicked = false
-          $('#loginModal').modal('show')
-        }
-      })
+      this.connectStatus = ''
     },
     billModifySwitchOn (index) {
       if (this.addingBillRecord) {
@@ -594,8 +621,494 @@ export default {
       this.modifying = -1
       this.modifyPaymentRecord = {}
     },
+    billDeleteSwitchOn (index) {
+      $('#delConfirmModal').modal({
+        backdrop: 'static'
+      })
+      this.billDeleting = index
+    },
+    billDeleteSwitchOff () {
+      this.billDeleting = -1
+    },
+    paymentDeleteSwitchOn (index) {
+      $('#delConfirmModal').modal({
+        backdrop: 'static'
+      })
+      this.paymentDeleting = index
+    },
+    paymentDeleteSwitchOff () {
+      this.paymentDeleting = -1
+    },
+    submitNewBillRecord () {
+      if (this.hasClicked) {
+        return
+      }
+      if (!this.billCheckFormat(this.newBillRecord)) {
+        alert('数据格式不正确或数据为空')
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            resId: this.residentDetail.id,
+            item: this.newBillRecord.item,
+            amount: this.newBillRecord.amount
+          }
+          this.connectStatus = '正在上传记录...'
+          this.axios.post(this.getAPI() + '/bill/add-record', postData).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '添加成功'
+              this.newBillRecord = {}
+              this.addingBillRecord = false
+              this.hasClicked = false
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/bill/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.billDetail = []
+                this.billModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate === null) {
+                    this.recordLoadingStatus = '暂无检查记录'
+                    break
+                  } else {
+                    this.recordLoadingStatus = ''
+                    let record = {
+                      item: response.data[i].item,
+                      amount: response.data[i].amount,
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.billModifyFlag.push(false)
+                    this.modifying = -1
+                    this.billDetail.push(record)
+                    this.billId.push(response.data[i].billId)
+                  }
+                }
+                this.loadingStatus = '加载完成'
+                this.loading = false
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  this.loadingStatus = '加载超时，请重试'
+                } else {
+                  console.log('post failed')
+                  console.log(response)
+                }
+              })
+              this.connectStatus = ''
+            } else if (response.data === 200) {
+              this.connectStatus = '添加失败请重试'
+              this.hasClicked = false
+            } else if (response.data === -999) {
+              this.connectStatus = '服务器错误，请稍后尝试'
+              this.hasClicked = false
+            }
+          }, response => {
+            console.log('post info failed')
+            console.log(response)
+          })
+        } else {
+          this.hasClicked = false
+          $('#loginModal').modal('show')
+        }
+      })
+    },
+    submitModBillRecord (index) {
+      if (this.hasClicked) {
+        return
+      }
+      if (!this.billCheckFormat(this.modifyBillRecord)) {
+        alert('数据格式不正确或数据为空')
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          this.connectStatus = '正在修改'
+          let postData = {
+            resId: this.residentDetail.id,
+            item: this.modifyPaymentRecord.item,
+            amount: this.modifyPaymentRecord.amount,
+            billId: this.billId[index]
+          }
+          this.axios.post(this.getAPI() + '/bill/modify-bill',
+            postData, { timeout: 15000 }).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '修改成功'
+              this.showAlert(true)
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/bill/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.billDeleting = []
+                this.billModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate == null) {
+                    this.recordLoadingStatus = '暂无记录'
+                    break
+                  } else {
+                    let record = {
+                      item: response.data[i].item,
+                      amount: response.data[i].amount,
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.billModifyFlag.push(false)
+                    this.billDetail.push(record)
+                    this.billId.push(response.data[i].billId)
+                  }
+                }
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  console.log('加载超时')
+                  console.log(response)
+                } else {
+                  console.log('get failed')
+                  console.log(response)
+                }
+              })
+            } else if (response.data === 200) {
+              this.connectStatus = '修改失败'
+              this.showAlert(false)
+              this.connectStatus = ''
+              console.log('修改失败')
+              console.log(response.data)
+            }
+          }, response => {
+            if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+              this.connectStatus = '加载超时，请重试'
+              this.connectStatus = ''
+              this.showAlert(false)
+            } else {
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('post payment failed')
+              console.log(response)
+            }
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+      this.hasClicked = false
+    },
+    submitDelBillRecord () {
+      if (this.hasClicked) {
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          this.connectStatus = '正在删除'
+          let postData = {
+            resId: this.residentDetail.id,
+            billId: this.billId[this.billDeleting]
+          }
+          this.axios.post(this.getAPI() + '/bill/delete-record',
+            postData, { timeout: 15000 }).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '删除成功'
+              $('#delConfirmModal').modal('hide')
+              this.showAlert(true)
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/bill/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.billDetail = []
+                this.billModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate == null) {
+                    this.recordLoadingStatus = '暂无记录'
+                    break
+                  } else {
+                    let record = {
+                      item: response.data[i].item,
+                      amount: response.data[i].amount,
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.billModifyFlag.push(false)
+                    this.billDetail.push(record)
+                    this.billId.push(response.data[i].billId)
+                  }
+                }
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  console.log('加载超时')
+                  console.log(response)
+                } else {
+                  console.log('get failed')
+                  console.log(response)
+                }
+              })
+              this.connectStatus = ''
+            } else if (response.data === 200) {
+              this.connectStatus = '删除失败'
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('删除失败')
+              console.log(response.data)
+            }
+          }, response => {
+            if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+              this.connectStatus = '加载超时，请重试'
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+            } else {
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('post bill failed')
+              console.log(response)
+            }
+          })
+          this.billDeleting = -1
+          this.hasClicked = false
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+    },
     submitNewPaymentRecord () {
-
+      if (this.hasClicked) {
+        return
+      }
+      if (!this.paymentCheckFormat(this.newPaymentRecord) || this.newPaymentRecord.paid == null) {
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            resId: this.residentDetail.id,
+            paid: this.newPaymentRecord.paid,
+            platform: 'CONSOLE'
+          }
+          this.connectStatus = '正在上传记录...'
+          this.axios.post(this.getAPI() + '/payment/add-record', postData).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '添加成功'
+              this.newPaymentRecord = {}
+              this.addingPaymentRecord = false
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/payment/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.paymentDetail = []
+                this.paymentModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate === null) {
+                    this.recordLoadingStatus = '暂无检查记录'
+                    break
+                  } else {
+                    this.recordLoadingStatus = ''
+                    let record = {
+                      paid: response.data[i].paid,
+                      platform: this.paymentPlatform(response.data[i].platform),
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.paymentModifyFlag.push(false)
+                    this.paymentDetail.push(record)
+                    this.paymentId.push(response.data[i].paymentId)
+                  }
+                }
+                this.loadingStatus = '加载完成'
+                this.loading = false
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  this.loadingStatus = '加载超时，请重试'
+                } else {
+                  console.log('post failed')
+                  console.log(response)
+                }
+              })
+              this.connectStatus = ''
+            } else if (response.data === 200) {
+              this.connectStatus = '添加失败请重试'
+            } else if (response.data === -999) {
+              this.connectStatus = '服务器错误，请稍后尝试'
+            }
+          }, response => {
+            console.log('post info failed')
+            console.log(response)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+      this.hasClicked = false
+    },
+    submitModPaymentRecord (index) {
+      if (this.hasClicked) {
+        return
+      }
+      if (!this.paymentCheckFormat(this.modifyPaymentRecord) || this.modifyPaymentRecord.paid == null) {
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          this.connectStatus = '正在修改'
+          let postData = {
+            resId: this.residentDetail.id,
+            paid: this.modifyPaymentRecord.paid,
+            paymentId: this.paymentId[index]
+          }
+          this.axios.post(this.getAPI() + '/payment/modify-record',
+            postData, { timeout: 15000 }).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '修改成功'
+              this.showAlert(true)
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/payment/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.paymentDeleting = []
+                this.paymentModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate == null) {
+                    this.recordLoadingStatus = '暂无记录'
+                    break
+                  } else {
+                    let record = {
+                      paid: response.data[i].paid,
+                      platform: this.paymentPlatform(response.data[i].platform),
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.paymentModifyFlag.push(false)
+                    this.paymentDetail.push(record)
+                    this.paymentId.push(response.data[i].paymentId)
+                  }
+                }
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  console.log('加载超时')
+                  console.log(response)
+                } else {
+                  console.log('get failed')
+                  console.log(response)
+                }
+              })
+            } else if (response.data === 200) {
+              this.connectStatus = '修改失败'
+              this.showAlert(false)
+              this.connectStatus = ''
+              console.log('修改失败')
+              console.log(response.data)
+            }
+          }, response => {
+            if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+              this.connectStatus = '加载超时，请重试'
+              this.connectStatus = ''
+              this.showAlert(false)
+            } else {
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('post payment failed')
+              console.log(response)
+            }
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+      this.hasClicked = false
+    },
+    submitDelPaymentRecord () {
+      if (this.hasClicked) {
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          this.connectStatus = '正在删除'
+          let postData = {
+            resId: this.residentDetail.id,
+            paymentId: this.paymentId[this.paymentDeleting]
+          }
+          this.axios.post(this.getAPI() + '/payment/delete-record',
+            postData, { timeout: 15000 }).then(response => {
+            if (response.data === 100) {
+              this.connectStatus = '删除成功'
+              $('#delConfirmModal').modal('hide')
+              this.showAlert(true)
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/payment/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.paymentDetail = []
+                this.paymentModifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate == null) {
+                    this.recordLoadingStatus = '暂无记录'
+                    break
+                  } else {
+                    let record = {
+                      paid: response.data[i].paid,
+                      platform: this.paymentPlatform(response.data[i].platform),
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.paymentModifyFlag.push(false)
+                    this.paymentDetail.push(record)
+                    this.paymentId.push(response.data[i].paymentId)
+                  }
+                }
+                // ！！开销过大！！
+                this.getAllBillInfo()
+                this.billNPayment.totalBill = this.billList[this.currentResident].totalBill
+                this.billNPayment.totalPaid = this.billList[this.currentResident].totalPaid
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  console.log('加载超时')
+                  console.log(response)
+                } else {
+                  console.log('get failed')
+                  console.log(response)
+                }
+              })
+              this.connectStatus = ''
+            } else if (response.data === 200) {
+              this.connectStatus = '删除失败'
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('删除失败')
+              console.log(response.data)
+            }
+          }, response => {
+            if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+              this.connectStatus = '加载超时，请重试'
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+            } else {
+              $('#delConfirmModal').modal('hide')
+              this.connectStatus = ''
+              this.showAlert(false)
+              console.log('post payment failed')
+              console.log(response)
+            }
+          })
+          this.paymentDeleting = -1
+          this.hasClicked = false
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
     },
     searchBill (evt) {
       evt.preventDefault()
@@ -621,15 +1134,24 @@ export default {
             }
           }, response => {
             console.log('search post failed')
-            console.log(response.data)
+            console.log(response)
           })
         } else {
           $('#loginModal').modal('show')
         }
       })
     },
-    checkFormat () {
-
+    paymentCheckFormat (obj) {
+      let paidRex = /^[0-9]+(\.[0-9]{1,2})?$/
+      return paidRex.test(obj.paid)
+    },
+    billCheckFormat (obj) {
+      if (obj.item == null || obj.amout == null) {
+        return false
+      } else {
+        let amountRex = /^[0-9]+(\.[0-9]{1,2})?$/
+        return obj.item.length <= 50 && amountRex.test(obj.amount)
+      }
     },
     dateTrim (date) {
       return this.$moment(date).format('YYYY-MM-DD')
@@ -645,6 +1167,13 @@ export default {
       } else {
         return '未知平台'
       }
+    },
+    countDownChanged (dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showAlert (operationStatus) {
+      this.operationSuccess = operationStatus
+      this.dismissCountDown = this.dismissSecs
     }
   },
   beforeMount () {

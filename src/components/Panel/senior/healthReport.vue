@@ -45,7 +45,7 @@
     <!--detail modal-->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="infoModalLabel">健康报告记录</h5>
@@ -171,7 +171,7 @@
     <!--login modal-->
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-md" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="loginModalLabel">会话超时</h5>
@@ -202,6 +202,7 @@ export default {
     return {
       healthReport: [],
       reportDetail: [],
+      reportId: [],
       reportSuggestion: [],
       showSgn: '',
       reportStatus: '',
@@ -258,8 +259,8 @@ export default {
         if (response) {
           this.axios.get(this.getAPI() + '/health/base-info').then(response => {
             this.healthReport = []
-            for (var i = 0; i < response.data.length; i++) {
-              var temp = {
+            for (let i = 0; i < response.data.length; i++) {
+              let temp = {
                 id: response.data[i].resId,
                 name: response.data[i].name,
                 sex: this.sexCheck(response.data[i].sex),
@@ -292,6 +293,7 @@ export default {
             this.reportDetail = []
             this.modifyFlag = []
             this.reportSuggestion = []
+            this.reportId = []
             this.residentDetail = {
               id: response.data[0].resId,
               name: response.data[0].name,
@@ -300,13 +302,13 @@ export default {
               bed: response.data[0].numOfBed,
               medicalHistory: response.data[0].medicalHistory
             }
-            for (var i = 0; i < response.data.length; i++) {
+            for (let i = 0; i < response.data.length; i++) {
               if (response.data[i].recordDate === null) {
                 this.reportStatus = '暂无检查记录'
                 break
               } else {
                 this.reportStatus = ''
-                var record = {
+                let record = {
                   height: response.data[i].height,
                   weight: response.data[i].weight,
                   heartRate: response.data[i].heartRate,
@@ -321,6 +323,7 @@ export default {
                 this.modifying = -1
                 this.reportDetail.push(record)
                 this.reportSuggestion.push(response.data[i].suggestion)
+                this.reportId.push(response.data[i].reportId)
               }
             }
             this.loadingStatus = '加载完成'
@@ -395,13 +398,14 @@ export default {
                 this.reportDetail = []
                 this.modifyFlag = []
                 this.reportSuggestion = []
-                for (var i = 0; i < response.data.length; i++) {
+                this.reportId = []
+                for (let i = 0; i < response.data.length; i++) {
                   if (response.data[i].recordDate === null) {
                     this.reportStatus = '暂无检查记录'
                     break
                   } else {
                     this.reportStatus = ''
-                    var record = {
+                    let record = {
                       height: response.data[i].height,
                       weight: response.data[i].weight,
                       heartRate: response.data[i].heartRate,
@@ -416,6 +420,7 @@ export default {
                     this.modifying = -1
                     this.reportDetail.push(record)
                     this.reportSuggestion.push(response.data[i].suggestion)
+                    this.reportId.push(response.data[i].reportId)
                     this.uploadStatus = ''
                   }
                 }
@@ -479,8 +484,8 @@ export default {
           let searchContent = { 'search': this.searchInput }
           this.axios.post(this.getAPI() + '/health/search', searchContent).then(response => {
             this.healthReport = []
-            for (var i = 0; i < response.data.length; i++) {
-              var temp = {
+            for (let i = 0; i < response.data.length; i++) {
+              let temp = {
                 id: response.data[i].resId,
                 name: response.data[i].name,
                 sex: this.sexCheck(response.data[i].sex),
