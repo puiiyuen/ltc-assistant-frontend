@@ -95,8 +95,43 @@
               </tr>
               </tbody>
             </table>
-            <button class="btn btn-primary btn-sm" @click="addSwitchOn">添加记录</button>
-            {{reportStatus}}
+            <div class="row">
+              <div class="col-4"></div>
+              <div class="col-4">
+                <template v-if="operationSuccess">
+                  <b-alert
+                    :show="dismissCountDown"
+                    dismissible
+                    fade
+                    variant="success"
+                    @dismissed="dismissCountDown=0"
+                    @dismiss-count-down="countDownChanged"
+                  >
+                    操作成功
+                  </b-alert>
+                </template>
+                <template v-if="!operationSuccess">
+                  <b-alert
+                    :show="dismissCountDown"
+                    dismissible
+                    fade
+                    variant="danger"
+                    @dismissed="dismissCountDown=0"
+                    @dismiss-count-down="countDownChanged"
+                  >
+                    操作失败，请稍后重试
+                  </b-alert>
+                </template>
+              </div>
+              <div class="col-4"></div>
+            </div>
+            <div class="row">
+              <div class="col-4">
+                <button class="btn btn-primary btn-sm" @click="addSwitchOn">添加记录</button>
+              </div>
+              <div class="col-4">{{reportStatus}}</div>
+              <div class="col-4"></div>
+            </div>
             <table class="table table-hover table-responsive-lg table-sm" id="history-record">
               <thead>
               <tr>
@@ -142,7 +177,7 @@
                 </td>
                 <td v-show="!modifyFlag[index]">
                   <button class="btn btn-warning btn-sm" @click="modifySwitchOn(index)">修改</button>
-                  <button class="btn btn-danger btn-sm">删除</button>
+                  <button class="btn btn-danger btn-sm" @click="deleteSwitchOn(index)">删除</button>
                 </td>
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.height"></td>
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.weight"></td>
@@ -154,7 +189,7 @@
                 <td v-show="modifyFlag[index]"><input type="text" class="form-control" v-model="modifyRecord.uricAcid"></td>
                 <td v-show="modifyFlag[index]" class="status-info">{{uploadStatus}}</td>
                 <td v-show="modifyFlag[index]">
-                  <button class="btn btn-primary btn-sm">提交</button>
+                  <button class="btn btn-primary btn-sm" @click="submitModRecord(index)">提交</button>
                   <button class="btn btn-danger btn-sm" @click="modifySwitchOff(index)">取消</button>
                 </td>
               </tr>
@@ -181,6 +216,30 @@
           </div>
           <div id="loginModalBody" class="modal-body">
             <LoginModal/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--delete confirmation-->
+    <div class="modal" tabindex="-1" role="dialog" id="delConfirmModal">
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">删除确认</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>确认删除记录？该操作不可恢复</p>
+            <div class="status-info">{{uploadStatus}}</div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-danger"
+                      :class="{disabled:hasClicked}" @click="submitDelRecord">确定</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                      :class="{disabled:hasClicked}" @click="deleteSwitchOff">取消</button>
           </div>
         </div>
       </div>
@@ -231,13 +290,18 @@ export default {
         uricAcid: '',
         suggestion: ''
       },
+      deleting: -1,
       recordFormat: {},
       residentDetail: {},
       loading: true,
       loadingStatus: '加载中...',
       uploadStatus: '',
       hasClicked: false,
-      searchInput: ''
+      searchInput: '',
+      operationSuccess: false,
+      dismissSecs: 3,
+      dismissCountDown: 0,
+      showDismissibleAlert: false
     }
   },
   computed: {
@@ -289,7 +353,8 @@ export default {
         if (response) {
           $('#infoModal').modal('show')
           let postData = { resId: this.healthReport[index].id }
-          this.axios.post(this.getAPI() + '/health/report-detail', postData, { timeout: 15000 }).then(response => {
+          this.axios.post(this.getAPI() + '/health/detail'
+            , postData, { timeout: 15000 }).then(response => {
             this.reportDetail = []
             this.modifyFlag = []
             this.reportSuggestion = []
@@ -363,11 +428,51 @@ export default {
       this.addingRecord = false
       this.newHealthRecord = {}
     },
+    modifySwitchOn (index) {
+      if (this.addingRecord) {
+        this.addSwitchOff()
+        this.modifying = index
+        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+      } else if (this.modifying === -1) {
+        this.modifying = index
+        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+      } else {
+        this.$set(this.modifyFlag, this.modifying, !this.modifyFlag[this.modifying])
+        this.modifying = index
+        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+      }
+      this.modifyRecord.height = this.reportDetail[index].height
+      this.modifyRecord.weight = this.reportDetail[index].weight
+      this.modifyRecord.heartRate = this.reportDetail[index].heartRate
+      this.modifyRecord.bpSystolic = this.reportDetail[index].bpSystolic
+      this.modifyRecord.bpDiastolic = this.reportDetail[index].bpDiastolic
+      this.modifyRecord.bloodGlucose = this.reportDetail[index].bloodGlucose
+      this.modifyRecord.bloodLipids = this.reportDetail[index].bloodLipids
+      this.modifyRecord.uricAcid = this.reportDetail[index].uricAcid
+      this.modifyRecord.suggestion = this.reportSuggestion[index]
+      this.uploadStatus = ''
+    },
+    modifySwitchOff (index) {
+      this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+      this.modifying = -1
+      this.modifyRecord = {}
+    },
+    deleteSwitchOn (index) {
+      $('#delConfirmModal').modal({
+        backdrop: 'static'
+      })
+      this.deleting = index
+      this.uploadStatus = ''
+    },
+    deleteSwitchOff () {
+      this.deleting = -1
+      $('#delConfirmModal').modal('hide')
+    },
     submitNewRecord () {
       if (this.hasClicked) {
         return
       }
-      if (this.checkFormat()) {
+      if (!this.checkFormat(this.newHealthRecord)) {
         return
       }
       this.hasClicked = true
@@ -393,7 +498,7 @@ export default {
               this.addingRecord = false
               this.hasClicked = false
               let refreshId = { resId: this.residentDetail.id }
-              this.axios.post(this.getAPI() + '/health/report-detail',
+              this.axios.post(this.getAPI() + '/health/detail',
                 refreshId, { timeout: 15000 }).then(response => {
                 this.reportDetail = []
                 this.modifyFlag = []
@@ -449,33 +554,166 @@ export default {
         }
       })
     },
-    modifySwitchOn (index) {
-      if (this.addingRecord) {
-        this.addSwitchOff()
-        this.modifying = index
-        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
-      } else if (this.modifying === -1) {
-        this.modifying = index
-        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
-      } else {
-        this.$set(this.modifyFlag, this.modifying, !this.modifyFlag[this.modifying])
-        this.modifying = index
-        this.$set(this.modifyFlag, index, !this.modifyFlag[index])
+    submitModRecord (index) {
+      if (this.hasClicked) {
+        return
       }
-      this.modifyRecord.height = this.reportDetail[index].height
-      this.modifyRecord.weight = this.reportDetail[index].weight
-      this.modifyRecord.heartRate = this.reportDetail[index].heartRate
-      this.modifyRecord.bpSystolic = this.reportDetail[index].bpSystolic
-      this.modifyRecord.bpDiastolic = this.reportDetail[index].bpDiastolic
-      this.modifyRecord.bloodGlucose = this.reportDetail[index].bloodGlucose
-      this.modifyRecord.bloodLipids = this.reportDetail[index].bloodLipids
-      this.modifyRecord.uricAcid = this.reportDetail[index].uricAcid
-      this.modifyRecord.suggestion = this.reportSuggestion[index]
+      if (!this.checkFormat(this.modifyRecord)) {
+        return
+      }
+      this.hasClicked = true
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            resId: this.residentDetail.id,
+            height: this.modifyRecord.height,
+            weight: this.modifyRecord.weight,
+            heartRate: this.modifyRecord.heartRate,
+            bpSystolic: this.modifyRecord.bpSystolic,
+            bpDiastolic: this.modifyRecord.bpDiastolic,
+            bloodGlucose: this.modifyRecord.bloodGlucose,
+            bloodLipids: this.modifyRecord.bloodLipids,
+            uricAcid: this.modifyRecord.uricAcid,
+            suggestion: this.modifyRecord.suggestion,
+            reportId: this.reportId[index]
+          }
+          this.uploadStatus = '正在上传记录...'
+          this.axios.post(this.getAPI() + '/health/modify-record', postData).then(response => {
+            if (response.data === 100) {
+              this.uploadStatus = '修改成功'
+              this.modifyRecord = {}
+              this.showAlert(true)
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/health/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.reportDetail = []
+                this.modifyFlag = []
+                this.reportSuggestion = []
+                this.reportId = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate === null) {
+                    this.reportStatus = '暂无检查记录'
+                    break
+                  } else {
+                    this.reportStatus = ''
+                    let record = {
+                      height: response.data[i].height,
+                      weight: response.data[i].weight,
+                      heartRate: response.data[i].heartRate,
+                      bpSystolic: response.data[i].bpSystolic,
+                      bpDiastolic: response.data[i].bpDiastolic,
+                      bloodGlucose: response.data[i].bloodGlucose,
+                      bloodLipids: response.data[i].bloodLipids,
+                      uricAcid: response.data[i].uricAcid,
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.modifyFlag.push(false)
+                    this.reportDetail.push(record)
+                    this.reportSuggestion.push(response.data[i].suggestion)
+                    this.reportId.push(response.data[i].reportId)
+                  }
+                }
+                this.modifying = -1
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  this.loadingStatus = '加载超时，请重试'
+                } else {
+                  console.log('post failed')
+                  console.log(response)
+                }
+              })
+            } else if (response.data === 200) {
+              this.uploadStatus = '修改失败请重试'
+              this.showAlert(false)
+            } else if (response.data === -999) {
+              this.uploadStatus = '服务器错误，请稍后尝试'
+              this.showAlert(false)
+            }
+          }, response => {
+            this.uploadStatus = '网络错误'
+            this.showAlert(false)
+            console.log('post info failed')
+            console.log(response)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+      this.hasClicked = false
     },
-    modifySwitchOff (index) {
-      this.$set(this.modifyFlag, index, !this.modifyFlag[index])
-      this.modifying = -1
-      this.modifyRecord = {}
+    submitDelRecord () {
+      if (this.hasClicked) {
+        return
+      }
+      this.hasClicked = true
+      this.uploadStatus = '正在删除'
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            resId: this.residentDetail.id,
+            reportId: this.reportId[this.deleting]
+          }
+          this.axios.post(this.getAPI() + '/health/delete-record',
+            postData, { timeout: 15000 }).then(response => {
+            if (response.data === 100) {
+              this.uploadStatus = '删除成功'
+              this.deleting = -1
+              this.showAlert(true)
+              $('#delConfirmModal').modal('hide')
+              let refreshId = { resId: this.residentDetail.id }
+              this.axios.post(this.getAPI() + '/health/detail',
+                refreshId, { timeout: 15000 }).then(response => {
+                this.reportDetail = []
+                this.reportSuggestion = []
+                this.reportId = []
+                this.modifyFlag = []
+                for (let i = 0; i < response.data.length; i++) {
+                  if (response.data[i].recordDate === null) {
+                    this.reportStatus = '暂无检查记录'
+                    break
+                  } else {
+                    this.reportStatus = ''
+                    let record = {
+                      height: response.data[i].height,
+                      weight: response.data[i].weight,
+                      heartRate: response.data[i].heartRate,
+                      bpSystolic: response.data[i].bpSystolic,
+                      bpDiastolic: response.data[i].bpDiastolic,
+                      bloodGlucose: response.data[i].bloodGlucose,
+                      bloodLipids: response.data[i].bloodLipids,
+                      uricAcid: response.data[i].uricAcid,
+                      recordDate: this.dateTimeTrim(response.data[i].recordDate)
+                    }
+                    this.modifyFlag.push(false)
+                    this.reportDetail.push(record)
+                    this.reportSuggestion.push(response.data[i].suggestion)
+                    this.reportId.push(response.data[i].reportId)
+                  }
+                }
+              }, response => {
+                if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+                  this.loadingStatus = '加载超时，请重试'
+                } else {
+                  console.log('post failed')
+                  console.log(response)
+                }
+              })
+            }
+          }, response => {
+            if (response.code === 'ECONNABORTED' && response.toString().indexOf('timeout') !== -1) {
+              this.uploadStatus = '加载超时，请重试'
+            } else {
+              console.log('post failed')
+              console.log(response)
+            }
+            $('#delConfirmModal').modal('hide')
+            this.showAlert(false)
+          })
+          this.hasClicked = false
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
     },
     searchHealthReport (evt) {
       evt.preventDefault()
@@ -507,8 +745,24 @@ export default {
         }
       })
     },
-    checkFormat () {
-
+    checkFormat (obj) {
+      if (obj.height == null || obj.weight == null || obj.heartRate == null || obj.bpSystolic == null ||
+      obj.bpDiastolic == null || obj.bloodGlucose == null || obj.bloodLipids == null ||
+      obj.uricAcid == null || obj.suggestion == null) {
+        alert('请将记录填写完整')
+        return false
+      } else {
+        let intRex = /^[0-9]+$/
+        let doubleNIntRex = /^[0-9]+(\.[0-9]{1,2})?$/
+        if (intRex.test(obj.heartRate) && intRex.test(obj.bpSystolic) && intRex.test(obj.bpDiastolic) &&
+          doubleNIntRex.test(obj.height) && doubleNIntRex.test(obj.weight) && doubleNIntRex.test(obj.bloodGlucose) &&
+          doubleNIntRex.test(obj.bloodLipids) && doubleNIntRex.test(obj.uricAcid) && (obj.suggestion.length < 100)) {
+          return true
+        } else {
+          alert('记录格式不正确')
+          return false
+        }
+      }
     },
     sexCheck (sex) {
       if (sex === 'MALE') {
@@ -524,6 +778,13 @@ export default {
     },
     dateTimeTrim (datetime) {
       return this.$moment(datetime).format('YYYY-MM-DD HH:mm:ss')
+    },
+    countDownChanged (dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+    showAlert (operationStatus) {
+      this.operationSuccess = operationStatus
+      this.dismissCountDown = this.dismissSecs
     }
   },
   beforeMount () {
