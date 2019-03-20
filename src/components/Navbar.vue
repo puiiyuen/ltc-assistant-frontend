@@ -27,7 +27,7 @@
           </div>
         </li>
       </ul>
-      <span class="navbar-text">智慧助手 v0.1.0</span>
+      <span class="navbar-text">智慧助手 v0.1.1</span>
       <div class="btn-group" id="user-center"  v-show="!online">
         <router-link :to="{name: 'login'}" tag="span" class="navbar-text">登陆管理系统</router-link>
       </div>

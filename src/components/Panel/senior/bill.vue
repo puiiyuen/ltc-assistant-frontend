@@ -91,21 +91,21 @@
                 <button class="btn btn-warning btn-sm" @click="addPaymentSwitchOn">支付账单</button>
               </div>
               <div class="col-6">
-                <div class="form-row">
-                  <div class="form-group input-group-sm mb-3 col-4">
-                    <datepicker id="detailStartDate" format="yyyy-MM-dd" :language="language.zh"
-                                placeholder="起始日期" :required="true"
-                                :clear-button="true" :bootstrap-styling="true" :typeable="true"/>
-                  </div>
-                  <div class="form-group input-group-sm mb-3 col-4">
-                    <datepicker id="detailEndDate" format="yyyy-MM-dd" :language="language.zh"
-                                placeholder="结束日期" :required="true"
-                                :clear-button="true" :bootstrap-styling="true" :typeable="true"/>
-                  </div>
-                  <div class="col-2">
-                    <button class="btn btn-info btn-sm">查询</button>
-                  </div>
-                </div>
+                <!--<div class="form-row">-->
+                  <!--<div class="form-group input-group-sm mb-3 col-4">-->
+                    <!--<datepicker id="detailStartDate" format="yyyy-MM-dd" :language="language.zh"-->
+                                <!--placeholder="起始日期" :required="true"-->
+                                <!--:clear-button="true" :bootstrap-styling="true" :typeable="true"/>-->
+                  <!--</div>-->
+                  <!--<div class="form-group input-group-sm mb-3 col-4">-->
+                    <!--<datepicker id="detailEndDate" format="yyyy-MM-dd" :language="language.zh"-->
+                                <!--placeholder="结束日期" :required="true"-->
+                                <!--:clear-button="true" :bootstrap-styling="true" :typeable="true"/>-->
+                  <!--</div>-->
+                  <!--<div class="col-2">-->
+                    <!--<button class="btn btn-info btn-sm">查询</button>-->
+                  <!--</div>-->
+                <!--</div>-->
               </div>
               <div class="col-2">{{recordLoadingStatus}}</div>
             </div>
