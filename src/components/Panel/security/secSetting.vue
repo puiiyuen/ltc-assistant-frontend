@@ -18,20 +18,21 @@
             ></el-amap-search-box>
             <el-amap
               class="amap-box"
-              :vid="'amap-vue'"
+              vid="amap-vue"
               :plugin="mapView.plugin"
               :center="mapView.mapCenter"
               :zoom="mapView.zoom"
+              :amap-manager="amapManager"
             >
               <el-amap-marker
                 v-for="marker in mapView.markers"
                 :position="marker"
               ></el-amap-marker>
               <el-amap-polygon :path="mapView.polygon.path" :editable="mapView.polygon.editable" :ref="`polygon_0`"
-                               :events="mapView.polygon.events" :draggable="mapView.polygon.dragEnable"
+                               :events="mapView.polygon.events" :draggable="mapView.polygon.editable"
                                fillOpacity="0.3" fillColor="blue"
                                strokeOpacity="0.6" strokeColor="pink"
-                               zIndex="10" :visible="mapView.polygon.visible">
+                               zIndex="50" :visible="mapView.polygon.visible">
               </el-amap-polygon>
             </el-amap>
           </div>
@@ -41,26 +42,58 @@
       <div class="row">
         <div class="col-4">
           <div class="map-toolbar">
-            <button type="button" class="btn btn-primary"
-                    @click="addGeoFence" :class="{disabled:disableClk}">添加围栏</button>
-            <button type="button" class="btn btn-success"
-                    @click="modifyGeoFence" :class="{disabled:!disableClk}">修改围栏</button>
-            <button type="button" class="btn btn-danger"
-                    @click="deleteGeoFence" :class="{disabled:!disableClk}">删除围栏</button>
+            <template v-if="!disableClk">
+            <button type="button" class="btn btn-primary" @click="addGeoFence">添加围栏</button>
+            </template>
+            <template v-if="disableClk">
+              <button type="button" class="btn btn-info" @click="getGeoFence">刷新围栏</button>
+              <button type="button" class="btn btn-success" @click="modifyGeoFence">修改围栏</button>
+              <button type="button" class="btn btn-danger" @click="deleteGeoFence">删除围栏</button>
+            </template>
           </div>
         </div>
-        <div class="col-4"></div>
         <div class="col-4">
-          <div class="map-toolbar" v-show="showSubmit">
+          <div class="status-info">{{operationStatus}}</div>
+        </div>
+        <div class="col-3">
+          <div class="map-toolbar" v-show="showSubmit" style="float: right;">
             <button type="button" class="btn btn-primary" @click="submitGeoFence">提交</button>
             <button type="button" class="btn btn-danger" @click="dismissAction">取消</button>
           </div>
         </div>
+        <div class="col-1"></div>
       </div>
 
-      <div class="row">
-        <div class="col-12">
-          {{geoFence}}
+      <label for="geo-fence-info"><strong>电子围栏信息</strong></label>
+      <div  id="geo-fence-info">
+        <div class="row">
+          <div class="col-12">
+            {{geoFence.name}}<br>
+            {{geoFence.valid_time}}<br>
+            {{geoFence.enable}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--delete confirm-->
+    <div class="modal" tabindex="-1" role="dialog" id="delConfirmModal">
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">删除确认</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>确认删除围栏？围栏数据不可恢复</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" @click="submitGeoFence">确定</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                    @click="dismissAction">取消</button>
+          </div>
         </div>
       </div>
     </div>
@@ -89,44 +122,38 @@
 <script>
 import $ from 'jquery'
 import LoginModal from '@/components/LoginModal'
+import VueAMap from 'vue-amap'
+let amapManager = new VueAMap.AMapManager()
 export default {
   name: 'secSetting',
   components: { LoginModal },
   data () {
-    let self = this.mapView
     return {
+      amapManager,
       mapView: {
         zoom: 14,
         markers: [],
         mapCenter: [113.874908, 22.902537],
         lng: 0,
         lat: 0,
-        // loaded: false,
+        currentLocation: '',
         plugin: [
           {
             pName: 'Geolocation',
             events: {
-              click (obj) {
-                obj.getCurrentLocation((status, result) => {
-                  if (result && result.position) {
-                    self.lng = result.position.lng
-                    self.lat = result.position.lat
-                    self.mapCenter = [self.lng, self.lat]
-                  }
-                })
-              }
               // init (o) {
-              //   // o 是高德地图定位插件实例
-              //   // auto load current location
-              //   o.getCurrentPosition((status, result) => {
-              //     if (result && result.position) {
-              //       self.lng = result.position.lng
-              //       self.lat = result.position.lat
-              //       self.center = [self.lng, self.lat]
-              //       self.loaded = true
-              //       self.$nextTick()
-              //     }
-              //   })
+              // o 是高德地图定位插件实例
+              // auto load current location
+              // o.getCurrentPosition((status, result) => {
+              //   if (result && result.position) {
+              //     console.log(result.position.lng + ' ' + result.position.lat)
+              //     self.mapView.lng = result.position.lng
+              //     self.mapView.lat = result.position.lat
+              //     self.mapView.mapCenter = [self.mapView.lng, self.mapView.lat]
+              //     // self.loaded = true
+              //     self.$nextTick()
+              //   }
+              // })
               // }
             }
           },
@@ -140,7 +167,6 @@ export default {
         ],
         polygon: {
           visible: false,
-          dragEnable: false,
           editable: false,
           // Initial path Dongguan University of T
           path: [[113.874908, 22.902537],
@@ -158,9 +184,11 @@ export default {
       geoFence: {},
       disableClk: true,
       showSubmit: false,
+      hasClicked: false,
       currentAction: -1, // 0:new,1:modify,2:delete,-1:default
       gid: '', // geo fence id
-      previousPath: []
+      previousPath: [],
+      operationStatus: ''
     }
   },
   computed: {
@@ -176,7 +204,8 @@ export default {
       }
     },
     mapCenter () {
-
+      console.log(this.mapView.mapCenter)
+      return this.mapView.mapCenter
     }
   },
   methods: {
@@ -199,45 +228,66 @@ export default {
       }
     },
     addGeoFence () {
+      this.operationStatus = ''
       if (this.disableClk) {
         return
       }
+
+      let lng = amapManager.getMap().getCenter().lng
+      let lat = amapManager.getMap().getCenter().lat
+      this.mapView.mapCenter = [lng, lat]
+      this.mapView.polygon.path = [
+        [lng - 0.005, lat + 0.005],
+        [lng + 0.005, lat + 0.005],
+        [lng + 0.005, lat - 0.005],
+        [lng - 0.005, lat - 0.005]
+      ]
+
       this.currentAction = 0
       this.showSubmit = true
       this.mapView.polygon.visible = true
       this.mapView.polygon.editable = true
-      this.mapView.polygon.dragEnable = true
     },
     modifyGeoFence () {
+      this.operationStatus = ''
       if (!this.disableClk) {
         return
       }
+
       this.previousPath = this.$refs.polygon_0.$$getPath()
       this.currentAction = 1
       this.showSubmit = true
       this.mapView.polygon.editable = true
-      this.mapView.polygon.dragEnable = true
     },
     deleteGeoFence () {
+      this.operationStatus = ''
       if (!this.disableClk) {
         return
       }
       this.currentAction = 2
+      $('#delConfirmModal').modal({
+        backdrop: 'static'
+      })
       // modal dialog
     },
     dismissAction () {
+      this.operationStatus = ''
       if (this.currentAction === 0) {
         this.showSubmit = false
         this.mapView.polygon.visible = false
         this.mapView.polygon.editable = false
-        this.mapView.polygon.dragEnable = false
       } else if (this.currentAction === 1) {
         this.mapView.polygon.path = this.previousPath
         this.showSubmit = false
         this.mapView.polygon.editable = false
-        this.mapView.polygon.dragEnable = false
       }
       this.currentAction = -1
+    },
+    setMapCenter (obj) {
+      this.mapView.mapCenter = [
+        parseFloat(obj.substring(0, obj.indexOf(','))),
+        parseFloat(obj.substring(obj.indexOf(',') + 1))
+      ]
     },
     setPolygonPath (obj) {
       this.mapView.polygon.path = []
@@ -272,21 +322,39 @@ export default {
       }
       return points
     },
+    checkNumOfPoints () {
+      if (this.$refs.polygon_0.$$getPath().length < 3 || this.$refs.polygon_0.$$getPath() > 5000) {
+        alert('围栏点的数量必须大于等于3个小于等于50个(3≤点数≤5000)')
+        return false
+      } else {
+        return true
+      }
+    },
     getGeoFence () {
       this.checkSession().then(response => {
         if (response) {
+          this.operationStatus = '获取围栏中...'
           this.axios.get('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey(),
             { withCredentials: false }).then(response => {
-            console.log(response)
+            // console.log(response)
             if (response.data.data.total_record === 0) {
+              this.operationStatus = '暂无围栏'
               this.disableClk = false
             } else if (response.data.data.total_record > 0) {
               this.disableClk = true
               this.mapView.polygon.visible = true
               this.setPolygonPath(response.data.data.rs_list[0].points)
+              this.setMapCenter(response.data.data.rs_list[0].center)
               this.gid = response.data.data.rs_list[0].gid
+              amapManager.getMap().setFitView()
+              this.geoFence = response.data.data.rs_list[0]
+              this.operationStatus = '围栏获取成功'
+            } else {
+              console.log('获取失败：' + response.data.data.message)
+              console.log(response)
             }
           }, response => {
+            this.operationStatus = '请求获取围栏失败'
             console.log('get geofence failed')
             console.log(response)
           })
@@ -296,12 +364,22 @@ export default {
       })
     },
     submitGeoFence () {
+      if (this.hasClicked) {
+        return
+      }
+      this.hasClicked = true
       this.checkSession().then(response => {
         if (response) {
+          this.mapView.polygon.editable = false
+          this.showSubmit = false
           if (this.currentAction === -1) {
 
           } else if (this.currentAction === 0) { // new geo fence
-            this.mapView.polygon.editable = false
+            if (!this.checkNumOfPoints()) {
+              this.hasClicked = false
+              return
+            }
+            this.operationStatus = '正在创建围栏...'
             let newGeoFence = {
               name: 'ltcGeoFence',
               points: this.getPolygonPath(),
@@ -309,20 +387,32 @@ export default {
               repeat: 'Mon,Tues,Wed,Thur,Fri,Sat,Sun',
               alert_condition: 'enter;leave'
             }
-            console.log(newGeoFence)
             this.axios.post('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey(),
               newGeoFence, { withCredentials: false }).then(response => {
               if (response.data.data.message === '成功') {
+                this.operationStatus = '围栏创建成功'
                 console.log('围栏创建成功')
+                this.gid = response.data.data.gid
+                amapManager.getMap().setFitView()
+                this.disableClk = true
               } else {
+                this.mapView.polygon.visible = false
+                this.operationStatus = '围栏创建失败: ' + response.data.data.message
                 console.log('围栏创建失败: ' + response.data.data.message)
               }
             }, response => {
+              this.operationStatus = '请求失败，围栏创建失败'
               console.log('网络请求失败')
               console.log('围栏创建失败')
               console.log(response)
             })
+            // end of add new geo fence
           } else if (this.currentAction === 1) { // modify geo fence
+            if (!this.checkNumOfPoints()) {
+              this.hasClicked = false
+              return
+            }
+            this.operationStatus = '正在更新围栏...'
             let modifyGeoFence = {
               name: 'ltcGeoFence',
               points: this.getPolygonPath(),
@@ -333,23 +423,54 @@ export default {
             this.axios.patch('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey() +
               '&gid=' + this.gid, modifyGeoFence, { withCredentials: false }).then(response => {
               if (response.data.data.message === '成功') {
+                this.operationStatus = '围栏更新成功'
+                amapManager.getMap().setFitView()
                 console.log('围栏更新成功')
+              } else {
+                this.mapView.polygon.path = this.previousPath
+                this.operationStatus = '围栏更新失败: ' + response.data.data.message
+                console.log('围栏更新失败: ' + response.data.data.message)
               }
             }, response => {
+              this.mapView.polygon.path = this.previousPath
+              this.operationStatus = '请求失败，围栏更新失败'
               console.log('网络请求失败')
               console.log('围栏更新失败')
               console.log(response)
             })
+          //  end of modify geo fence
           } else if (this.currentAction === 2) { // delete geo fence
-
+            this.operationStatus = '正在删除围栏...'
+            $('#delConfirmModal').modal('hide')
+            this.axios.delete('https://restapi.amap.com/v4/geofence/meta?key=' +
+              this.getMapKey() + '&gid=' + this.gid,
+            { withCredentials: false }).then(response => {
+              if (response.data.data.message === '成功') {
+                this.operationStatus = '围栏删除成功'
+                this.mapView.polygon.visible = false
+                this.mapView.polygon.editable = false
+                this.disableClk = false
+                this.mapView.polygon.path = []
+              } else {
+                this.operationStatus = '围栏删除失败：' + response.data.data.message
+                console.log('围栏删除失败：' + response.data.data.message)
+              }
+            }, response => {
+              this.operationStatus = '请求失败，围栏删除失败'
+              console.log('网络请求失败')
+              console.log('围栏删除失败')
+              console.log(response)
+            })
+            // end of delete geo fence
           } else {
 
           }
-          this.dismissAction()
+          this.currentAction = -1
         } else {
           $('#loginModal').modal('show')
         }
       })
+      this.hasClicked = false
     }
   },
   beforeMount () {
@@ -384,5 +505,9 @@ export default {
 
   .map-toolbar button {
     margin-right: 5px;
+  }
+
+  .status-info {
+    padding: 15px 0;
   }
 </style>
