@@ -8,6 +8,7 @@ import palette from './util/palette.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueMoment from 'vue-moment'
+import VueAMap from 'vue-amap'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
@@ -18,16 +19,26 @@ Vue.use(BootstrapVue)
 Vue.use(util)
 Vue.use(palette)
 Vue.use(VueMoment)
+Vue.use(VueAMap)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
 axios.defaults.withCredentials = true
+axios.defaults.timeout = 15000
 
 new Vue({
   router,
   store,
   render: h => h(App)
 }).$mount('#app')
+
+VueAMap.initAMapApiLoader({
+  key: '59b3f2490ff8de81a4f04dac4b366d21',
+  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar',
+    'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor', 'AMap.Geolocation'],
+  // 默认高德 sdk 版本为 1.4.4
+  v: '1.4.4'
+})
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限

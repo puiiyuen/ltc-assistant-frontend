@@ -24,5 +24,9 @@ export default {
       // let api = ''
       return api
     }
+    Vue.prototype.getMapKey = function () {
+      let mapKey = '131de27d6464c67c35e5d7a6f00d27a2'
+      return mapKey
+    }
   }
 }

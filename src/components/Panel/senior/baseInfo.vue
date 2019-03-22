@@ -3,8 +3,8 @@
     <div id="panel-title"><h5><strong>基本信息</strong></h5></div>
     <div id="function-bar">
       <div id="operation-bar">
-        <button class="btn btn-success" @click="getAllResidentInfo">全部住户</button>
-        <button class="btn btn-primary" @click="addResidentSwitchOn">添加住户</button>
+        <button type="button" class="btn btn-success" @click="getAllResidentInfo">全部住户</button>
+        <button type="button" class="btn btn-primary" @click="addResidentSwitchOn">添加住户</button>
       </div>
       <form class="form-inline my-2 my-lg-0" id="search-bar" @submit="searchResident">
         <label for="search-input" style="padding-right:15px">搜索住户:</label>
@@ -564,6 +564,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
