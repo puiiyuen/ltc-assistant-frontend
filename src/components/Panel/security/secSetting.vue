@@ -136,7 +136,6 @@ export default {
         mapCenter: [113.874908, 22.902537],
         lng: 0,
         lat: 0,
-        currentLocation: '',
         plugin: [
           {
             pName: 'Geolocation',
@@ -202,10 +201,6 @@ export default {
         $('#loginModal').modal('hide')
         this.getGeoFence()
       }
-    },
-    mapCenter () {
-      console.log(this.mapView.mapCenter)
-      return this.mapView.mapCenter
     }
   },
   methods: {
@@ -333,6 +328,7 @@ export default {
     getGeoFence () {
       this.checkSession().then(response => {
         if (response) {
+          this.hasClicked = true
           this.operationStatus = '获取围栏中...'
           this.axios.get('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey(),
             { withCredentials: false }).then(response => {
@@ -361,6 +357,7 @@ export default {
         } else {
           $('#loginModal').modal('show')
         }
+        this.hasClicked = false
       })
     },
     submitGeoFence () {
@@ -500,8 +497,8 @@ export default {
   }
 
   .map-toolbar {
-    padding: 10px 0;
-  }
+       padding: 10px 0;
+     }
 
   .map-toolbar button {
     margin-right: 5px;
