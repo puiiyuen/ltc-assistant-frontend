@@ -11,7 +11,7 @@
   <label for="geo-fence"><strong>电子围栏</strong></label>
   <div id="geo-fence">
     <div class="row">
-      <div class="col-12">
+      <div class="col-11">
        <div class="amap-wrapper">
          <el-amap
            vid="amap-geo-fence"
@@ -33,6 +33,7 @@
          </el-amap>
        </div>
       </div>
+      <div class="col-1"></div>
     </div>
   </div>
   <div class="row">
@@ -197,6 +198,9 @@ export default {
 </script>
 
 <style scoped>
+  #loginModalBody {
+    height: 450px;
+  }
 
   .amap-wrapper{
     width: 100%;

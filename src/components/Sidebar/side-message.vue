@@ -10,10 +10,10 @@
               <ul class="list-group parent-list-group">
                 <router-link :to="{name: 'message', params:{toPath:'message'}}" class="list-group-item"
                              tag="li">概览</router-link>
-                <router-link :to="{name: 'bulletinBoard', params:{toPath:'bulletinBoard'}}" class="list-group-item"
-                             tag="li" active-class="link-selected">公告发布</router-link>
+                <router-link :to="{name: 'notice', params:{toPath:'notice'}}" class="list-group-item"
+                             tag="li" active-class="link-selected">公告板</router-link>
                 <router-link :to="{name: 'feedback', params:{toPath:'feedback'}}" class="list-group-item"
-                             tag="li" active-class="link-selected">意见反馈</router-link>
+                             tag="li" active-class="link-selected">意见采集</router-link>
               </ul>
             </div>
           </b-col>

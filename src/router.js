@@ -102,10 +102,10 @@ export default new Router({
           component: () => import('./components/Panel/panel-message'),
           meta: { requireAuth: true }
         },
-        {// bulletin board
-          path: 'bulletin-board',
-          name: 'bulletinBoard',
-          component: () => import('./components/Panel/message/bulletinBoard'),
+        {// notice
+          path: 'notice',
+          name: 'notice',
+          component: () => import('./components/Panel/message/notice'),
           meta: { requireAuth: true }
         },
         {// bulletin board

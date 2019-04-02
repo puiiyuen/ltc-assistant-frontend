@@ -9,6 +9,11 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueMoment from 'vue-moment'
 import VueAMap from 'vue-amap'
+import VueQuillEditor from 'vue-quill-editor'
+
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
@@ -20,6 +25,7 @@ Vue.use(util)
 Vue.use(palette)
 Vue.use(VueMoment)
 Vue.use(VueAMap)
+Vue.use(VueQuillEditor)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true

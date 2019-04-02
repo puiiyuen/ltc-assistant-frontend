@@ -326,8 +326,8 @@ import * as lang from 'vuejs-datepicker/src/locale'
 export default {
   name: 'bill',
   components: {
-    LoginModal,
-    Datepicker
+    LoginModal
+    // Datepicker
   },
   data () {
     return {
