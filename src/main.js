@@ -9,7 +9,8 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueMoment from 'vue-moment'
 import VueAMap from 'vue-amap'
-import VueQuillEditor from 'vue-quill-editor'
+import VueFroala from 'vue-froala-wysiwyg'
+import jQuery from 'jquery'
 
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -19,13 +20,24 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+// Require Froala Editor js file.
+require('froala-editor/js/froala_editor.pkgd.min')
+
+// Require Froala Editor css files.
+require('froala-editor/css/froala_editor.pkgd.min.css')
+require('font-awesome/css/font-awesome.css')
+require('froala-editor/js/languages/zh_cn')
+require('froala-editor/css/froala_style.min.css')
+
+window.$ = jQuery
+
 Vue.use(VueAxios, axios)
 Vue.use(BootstrapVue)
 Vue.use(util)
 Vue.use(palette)
 Vue.use(VueMoment)
 Vue.use(VueAMap)
-Vue.use(VueQuillEditor)
+Vue.use(VueFroala)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
