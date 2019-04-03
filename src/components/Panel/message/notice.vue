@@ -20,14 +20,10 @@
           <div class="col-10"></div>
         </div>
         <div class="row">
-          <div class="col-10">
+          <div class="col-11">
             <label for="notice-editor">公告内容</label>
             <div id="notice-editor">
-              <quill-editor v-model="content"
-                            ref="myQuillEditor"
-                            :options="editorOption"
-              >
-              </quill-editor>
+              <froala :tag="'textarea'" :config="froalaConfig" v-model="froalaContent"></froala>
             </div>
             <div class="row">
               <div class="col-10"></div>
@@ -37,14 +33,14 @@
               </div>
             </div>
           </div>
-          <div class="col-2"></div>
+          <div class="col-1"></div>
         </div>
       </div>
 
       <label for="current-notices"><strong>当前展示公告</strong></label>
       <div id="current-notices">
         <div class="row">
-          <div class="col-10">
+          <div class="col-11">
             <table class="table table-hover table-responsive-lg">
               <thead>
               <tr>
@@ -70,14 +66,14 @@
               </tbody>
             </table>
           </div>
-          <div class="col-2"></div>
+          <div class="col-1"></div>
         </div>
       </div>
 
       <label for="old-notices"><strong>过去公告</strong></label>
       <div id="old-notices">
         <div class="row">
-          <div class="col-10">
+          <div class="col-11">
             <table class="table table-hover table-responsive-lg">
               <thead>
               <tr>
@@ -103,7 +99,7 @@
               </tbody>
             </table>
           </div>
-          <div class="col-2"></div>
+          <div class="col-1"></div>
         </div>
       </div>
 
@@ -138,18 +134,30 @@ export default {
   },
   data () {
     return {
-      content: '',
-      editorOption: {
-        placeholder: '输入公告',
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'size': ['small', false, 'large', 'huge'] }],
-            [{ 'align': [] }],
-            ['image']
-          ]
-        }
+      froalaConfig: {
+        toolbarButtons: ['undo', 'redo', 'clearFormatting', '|', 'bold', 'italic', 'underline', 'strikeThrough', '|',
+          'fontFamily', 'fontSize', 'color', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent',
+          'indent', 'quote', '-', 'insertLink', 'insertImage', 'insertVideo', 'embedly', 'insertFile', 'insertTable',
+          '|', 'emoticons', 'specialCharacters', 'insertHR', 'selectAll', '|', 'print', 'spellChecker', 'help',
+          '|', 'fullscreen'], // ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertImage', 'insertVideo', 'embedly', 'insertFile', 'insertTable', '|', 'emoticons', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'print', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],//显示可操作项
+        // theme: "dark",//主题
+        placeholder: '请填写内容',
+        language: 'zh_cn', // 国际化
+        imageUploadURL: 'http://i.froala.com/upload', // 上传url
+        fileUploadURL: 'http://i.froala.com/upload', // 上传url 更多上传介绍 请访问https://www.froala.com/wysiwyg-editor/docs/options
+        // toolbarVisibleWithoutSelection: true,//是否开启 不选中模式
+        // disableRightClick: true,//是否屏蔽右击
+        colorsHEXInput: false, // 关闭16进制色值
+        toolbarSticky: true, // 操作栏是否自动吸顶
+        zIndex: 99999,
+        events: {
+          'froalaEditor.initialized': function () {
+            console.log('initialized')
+          }
+        },
+        requestWithCredentials: true
       },
+      froalaContent: '<p>you did it</p>', // 默认测试文本
       oldRecords: [{
         title: '最新活动最新活动最新活动最新活动最新活动最新活动最新活动',
         createDate: '2019-03-15 15:30:15',

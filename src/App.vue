@@ -9,12 +9,14 @@
 <script>
 
 import Navbar from './components/Navbar'
+import * as lang from 'vuejs-datepicker/src/locale'
 export default {
   name: 'App',
   components: { Navbar },
   data () {
     return {
-
+      moveInDate: '',
+      language: lang
     }
   },
   methods: {

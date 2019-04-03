@@ -15,8 +15,8 @@
     "vue": "^2.6.8",
     "vue-amap": "^0.5.8",
     "vue-axios": "^2.1.4",
+    "vue-froala-wysiwyg": "^2.9.3",
     "vue-moment": "^4.0.0",
-    "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
     "vuejs-datepicker": "^1.5.4",
     "vuex": "^3.0.1"
