@@ -11,7 +11,7 @@
       <label for="feedback-list"><strong>意见列表</strong></label>
       <div id="feedback-list">
         <div class="row">
-          <div class="col-10">
+          <div class="col-11">
             <table class="table table-hover table-responsive-lg">
               <thead>
               <tr>
@@ -35,7 +35,7 @@
               </tbody>
             </table>
           </div>
-          <div class="col-2"></div>
+          <div class="col-1"></div>
         </div>
       </div>
 

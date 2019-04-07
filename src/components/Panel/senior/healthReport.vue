@@ -238,7 +238,7 @@
           <div class="modal-footer">
               <button type="button" class="btn btn-danger"
                       :class="{disabled:hasClicked}" @click="submitDelRecord">确定</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+              <button type="button" class="btn btn-secondary"
                       :class="{disabled:hasClicked}" @click="deleteSwitchOff">取消</button>
           </div>
         </div>
@@ -465,6 +465,9 @@ export default {
       this.uploadStatus = ''
     },
     deleteSwitchOff () {
+      if (this.hasClicked) {
+        return
+      }
       this.deleting = -1
       $('#delConfirmModal').modal('hide')
     },
@@ -709,11 +712,11 @@ export default {
             $('#delConfirmModal').modal('hide')
             this.showAlert(false)
           })
-          this.hasClicked = false
         } else {
           $('#loginModal').modal('show')
         }
       })
+      this.hasClicked = false
     },
     searchHealthReport (evt) {
       evt.preventDefault()
