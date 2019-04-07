@@ -339,7 +339,7 @@ export default {
             }
           }, response => {
             console.log('Get Failed')
-            console.log(response.data)
+            console.log(response)
           })
         } else {
           $('#loginModal').modal('show')

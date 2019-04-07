@@ -11,25 +11,26 @@
       <label for="new-notice"><strong>公告发布</strong></label>
       <div id="new-notice">
         <div class="row">
-          <div class="col-2">
+          <div class="col-4">
               <div class="form-group">
                 <label for="new-notice-title">公告标题</label>
-                <input id="new-notice-title" type="text" class="form-control" aria-describedby="inputGroup-sizing-sm">
+                <input id="new-notice-title" type="text" class="form-control"
+                       aria-describedby="inputGroup-sizing-sm" v-model="newNotice.title">
               </div>
           </div>
-          <div class="col-10"></div>
+          <div class="col-8"></div>
         </div>
         <div class="row">
           <div class="col-11">
             <label for="notice-editor">公告内容</label>
             <div id="notice-editor">
-              <froala :tag="'textarea'" :config="froalaConfig" v-model="froalaContent"></froala>
+              <froala :tag="'textarea'" :config="froalaConfig" v-model="newNotice.content"></froala>
             </div>
             <div class="row">
               <div class="col-10"></div>
               <div class="col-2">
-                <button type="button" class="btn btn-danger">重置</button>
-                <button type="button" class="btn btn-primary">提交</button>
+                <button type="button" class="btn btn-danger" @click="resetNewNotice">重置</button>
+                <button type="button" class="btn btn-primary" @click="submitNewNotice">提交</button>
               </div>
             </div>
           </div>
@@ -136,45 +137,28 @@ export default {
     return {
       froalaConfig: {
         toolbarButtons: ['undo', 'redo', 'clearFormatting', '|', 'bold', 'italic', 'underline', 'strikeThrough', '|',
-          'fontFamily', 'fontSize', 'color', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent',
-          'indent', 'quote', '-', 'insertLink', 'insertImage', 'insertVideo', 'embedly', 'insertFile', 'insertTable',
-          '|', 'emoticons', 'specialCharacters', 'insertHR', 'selectAll', '|', 'print', 'spellChecker', 'help',
-          '|', 'fullscreen'], // ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertImage', 'insertVideo', 'embedly', 'insertFile', 'insertTable', '|', 'emoticons', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'print', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],//显示可操作项
-        // theme: "dark",//主题
+          'fontFamily', 'fontSize', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent',
+          'indent', 'insertLink', 'insertImage', 'insertTable',
+          '|', 'specialCharacters', 'insertHR', 'selectAll', '|', 'print', 'help', 'fullscreen'],
         placeholder: '请填写内容',
         language: 'zh_cn', // 国际化
-        imageUploadURL: 'http://i.froala.com/upload', // 上传url
-        fileUploadURL: 'http://i.froala.com/upload', // 上传url 更多上传介绍 请访问https://www.froala.com/wysiwyg-editor/docs/options
-        // toolbarVisibleWithoutSelection: true,//是否开启 不选中模式
-        // disableRightClick: true,//是否屏蔽右击
+        // imageMaxSize: 1024 * 1024,
+        imageUploadURL: this.getAPI() + '/notice/upload-picture',
+        // imageManagerDeleteMethod:'',
+        // imageManagerDeleteURL:'',
+        zIndex: 1,
         colorsHEXInput: false, // 关闭16进制色值
         toolbarSticky: true, // 操作栏是否自动吸顶
-        zIndex: 99999,
-        events: {
-          'froalaEditor.initialized': function () {
-            console.log('initialized')
-          }
-        },
         requestWithCredentials: true
       },
-      froalaContent: '<p>you did it</p>', // 默认测试文本
-      oldRecords: [{
-        title: '最新活动最新活动最新活动最新活动最新活动最新活动最新活动',
-        createDate: '2019-03-15 15:30:15',
-        updateDate: '2019-03-15 15:30:15'
+      newNotice: {
+        title: '',
+        content: ''
       },
-      {
-        title: '最新活动最新活动最新活动最新活动最新活动最新活动最新活动',
-        createDate: '2019-03-15 15:30:15',
-        updateDate: '2019-03-15 15:30:15'
-      }],
-      currentRecords: [
-        {
-          title: '最新活动最新活动最新活动最新活动最新活动最新活动最新活动',
-          createDate: '2019-03-15 15:30:15',
-          updateDate: '2019-03-15 15:30:15'
-        }
-      ]
+      oldRecords: [],
+      oldRecordId: [],
+      currentRecords: [],
+      currentRecordId: []
     }
   },
   computed: {
@@ -186,10 +170,102 @@ export default {
     isOnline () {
       if (this.$store.getters.getOnline) {
         $('#loginModal').modal('hide')
+        this.getNoticeList()
       }
     }
   },
   methods: {
+    getNoticeList () {
+      this.getCurrentList()
+      this.getOldList()
+    },
+    getCurrentList () {
+      this.checkSession().then(response => {
+        if (response) {
+          this.axios.get(this.getAPI() + '/notice/current-list').then(response => {
+            this.currentRecords = []
+            this.currentRecordId = []
+            for (let i = 0; i < response.data.length; i++) {
+              let temp = {
+                noticeTitle: response.data[i].noticeTitle,
+                createDate: this.dateTimeTrim(response.data[i].createDate),
+                updateDate: this.dateTimeTrim(response.data[i].updateDate)
+              }
+              this.currentRecordId.push(response.data[i].noticeId)
+              this.currentRecords.push(temp)
+            }
+          }, response => {
+            console.log('Get Failed')
+            console.log(response)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+    },
+    getOldList () {
+      this.checkSession().then(response => {
+        if (response) {
+          this.axios.get(this.getAPI() + '/notice/old-list').then(response => {
+            this.oldRecords = []
+            this.oldRecordId = []
+            for (let i = 0; i < response.data.length; i++) {
+              let temp = {
+                noticeTitle: response.data[i].noticeTitle,
+                createDate: this.dateTimeTrim(response.data[i].createDate),
+                updateDate: this.dateTimeTrim(response.data[i].updateDate)
+              }
+              this.oldRecordId.push(response.data[i].noticeId)
+              this.oldRecords.push(temp)
+            }
+          }, response => {
+            console.log('Get Failed')
+            console.log(response)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+    },
+    submitNewNotice () {
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            noticeTitle: this.newNotice.title,
+            noticeContent: this.newNotice.content
+          }
+          this.axios.post(this.getAPI() + '/notice/new', postData).then(response => {
+            if (response.data.operationStatus === 100) {
+              let temp = {
+                noticeTitle: this.newNotice.title,
+                createDate: this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+                updateDate: this.$moment().format('YYYY-MM-DD HH:mm:ss')
+              }
+              this.oldRecords.unshift(temp)
+              this.oldRecordId.unshift(response.data.noticeId)
+              this.resetNewNotice()
+            }
+          }, response => {
+
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+    },
+    dateTimeTrim (datetime) {
+      return this.$moment(datetime).format('YYYY-MM-DD HH:mm:ss')
+    },
+    checkFormat (obj) {
+
+    },
+    resetNewNotice () {
+      this.newNotice.title = ''
+      this.newNotice.content = ''
+    }
+  },
+  beforeMount () {
+    this.getNoticeList()
   }
 }
 </script>
