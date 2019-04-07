@@ -178,9 +178,6 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">删除确认</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
             </div>
             <div class="modal-body">
               <p>确认删除公告？该操作不可恢复</p>
