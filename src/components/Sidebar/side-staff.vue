@@ -12,10 +12,10 @@
                              tag="li">概览</router-link>
                 <router-link :to="{name: 'staffInfo', params:{toPath:'staffInfo'}}" class="list-group-item"
                              tag="li" active-class="link-selected">基本信息</router-link>
-                <router-link :to="{name: 'assignment', params:{toPath:'assignment'}}" class="list-group-item"
-                             tag="li" active-class="link-selected">工作安排</router-link>
-                <router-link :to="{name: 'staffMovement', params:{toPath:'staffMovement'}}" class="list-group-item"
-                             tag="li" active-class="link-selected">人事调动</router-link>
+                <!--<router-link :to="{name: 'assignment', params:{toPath:'assignment'}}" class="list-group-item"-->
+                             <!--tag="li" active-class="link-selected">工作安排</router-link>-->
+                <!--<router-link :to="{name: 'staffMovement', params:{toPath:'staffMovement'}}" class="list-group-item"-->
+                             <!--tag="li" active-class="link-selected">人事调动</router-link>-->
               </ul>
             </div>
           </b-col>

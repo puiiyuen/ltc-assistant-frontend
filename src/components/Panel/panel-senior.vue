@@ -1,8 +1,8 @@
 <template>
   <b-container fluid>
     <div id="panel-detail">
-      <h2>长者管理</h2>
-      <p>请选择从左侧菜单选取</p>
+      <h2>数据图表可视化页面</h2>
+      <p></p>
     </div>
 
   </b-container>

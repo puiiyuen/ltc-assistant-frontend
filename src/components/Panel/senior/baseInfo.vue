@@ -964,7 +964,7 @@ export default {
                     this.uploadStatus = ''
                     this.modifyResident = {}
                     this.showAlert()
-                    $('#newResPhoto').val('')
+                    $('#modifyResPhoto').val('')
                     this.getAllResidentInfo()
                   } else if (response.data === 200) {
                     this.uploadStatus = '照片上传失败请重试'

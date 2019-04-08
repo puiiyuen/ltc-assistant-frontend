@@ -1,8 +1,7 @@
 <template>
   <b-container fluid>
     <div id="panel-detail">
-      <h2></h2>
-      <p></p>
+      <h2>数据图表可视化页面</h2>
     </div>
 
   </b-container>
