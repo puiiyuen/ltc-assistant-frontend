@@ -1,8 +1,23 @@
 <template>
   <b-container fluid>
     <div id="panel-detail">
-      <h2>数据图表可视化页面</h2>
-      <p></p>
+      <h2>员工管理</h2>
+      <div class="row">
+        <div class="col-6">
+          <ve-histogram :data="chartData" :extend="extend"></ve-histogram>
+        </div>
+        <div class="col-6">
+          <ve-histogram :data="chartData" :extend="extend"></ve-histogram>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <ve-histogram :data="chartData" :extend="extend"></ve-histogram>
+        </div>
+        <div class="col-6">
+          <ve-histogram :data="chartData" :extend="extend"></ve-histogram>
+        </div>
+      </div>
     </div>
 
   </b-container>
@@ -12,7 +27,19 @@
 export default {
   name: 'Panel',
   data () {
-    return {}
+    this.extend = {
+      series: {
+        label: { show: true, position: 'top' }
+      }
+    }
+    return {
+      chartData: {
+        columns: ['员工', '空闲', '忙碌', '下班'],
+        rows: [
+          { '员工': '人员状态分布', '空闲': 1, '忙碌': 3, '下班': 2 }
+        ]
+      }
+    }
   }
 }
 </script>

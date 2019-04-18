@@ -11,6 +11,7 @@ import VueMoment from 'vue-moment'
 import VueAMap from 'vue-amap'
 import VueFroala from 'vue-froala-wysiwyg'
 import jQuery from 'jquery'
+import VCharts from 'v-charts'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min'
@@ -34,6 +35,7 @@ Vue.use(palette)
 Vue.use(VueMoment)
 Vue.use(VueAMap)
 Vue.use(VueFroala)
+Vue.use(VCharts)
 
 Vue.config.productionTip = false
 Vue.config.devtools = true

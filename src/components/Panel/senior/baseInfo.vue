@@ -43,7 +43,7 @@
     <!--detail modal-->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="infoModalLabel">详细信息</h5>
@@ -152,7 +152,7 @@
     <!--add resident modal-->
     <div class="modal fade" id="addResidentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addResidentModalLabel">添加住户</h5>
@@ -339,7 +339,7 @@
     <!--modify resident modal-->
     <div class="modal fade" id="modifyResidentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modifyResidentModalLabel">修改资料</h5>

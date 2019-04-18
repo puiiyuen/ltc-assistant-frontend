@@ -44,7 +44,7 @@
     <!--detail modal-->
     <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="infoModalLabel">详细信息</h5>
@@ -118,7 +118,7 @@
     <!--add staff modal-->
     <div class="modal fade" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addStaffModalLabel">添加员工</h5>
@@ -245,7 +245,7 @@
     <!--modify staff modal-->
     <div class="modal fade" id="modifyStaffModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modifyStaffModalLabel">修改资料</h5>
@@ -640,6 +640,7 @@ export default {
     },
     modifyStaffSwitchOn () {
       this.modifyStaff = {}
+      this.uploadStatus = ''
       $('#modifyStaffModal').modal('show')
       this.modifyStaff.name = this.staffDetail.name
       if (this.staffDetail.sex === '男') {
@@ -742,6 +743,7 @@ export default {
       this.hasClicked = false
     },
     destroyStaffSwitchOn () {
+      this.uploadStatus = ''
       $('#delConfirmModal').modal({
         backdrop: 'static'
       })

@@ -116,10 +116,12 @@ export default {
           visible: false,
           editable: false,
           // Initial path Dongguan University of T
-          path: [[113.874908, 22.902537],
-            [113.879000, 22.902537],
-            [113.879000, 22.905000],
-            [113.874908, 22.905000]]
+          path: [
+            // [113.874908, 22.902537],
+            // [113.879000, 22.902537],
+            // [113.879000, 22.905000],
+            // [113.874908, 22.905000]
+          ]
         }
       },
       operationStatus: ''
@@ -174,6 +176,8 @@ export default {
               this.setPolygonPath(response.data.data.rs_list[0].points)
               this.setMapCenter(response.data.data.rs_list[0].center)
               this.mapView.markers.push([113.874908, 22.902537])
+              this.mapView.markers.push([113.874908, 22.905000])
+              this.mapView.markers.push([113.879000, 22.902537])
               this.operationStatus = '围栏获取成功'
               amapManager.getMap().setFitView()
             } else {

@@ -168,10 +168,12 @@ export default {
           visible: false,
           editable: false,
           // Initial path Dongguan University of T
-          path: [[113.874908, 22.902537],
-            [113.879000, 22.902537],
-            [113.879000, 22.905000],
-            [113.874908, 22.905000]],
+          path: [
+            // [113.874908, 22.902537],
+            // [113.879000, 22.902537],
+            // [113.879000, 22.905000],
+            // [113.874908, 22.905000]
+          ],
           events: {
             click: () => {
               console.log(this.$refs.polygon_0.$$getPath())
@@ -387,10 +389,23 @@ export default {
             this.axios.post('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey(),
               newGeoFence, { withCredentials: false }).then(response => {
               if (response.data.data.message === '成功') {
-                this.operationStatus = '围栏创建成功'
-                console.log('围栏创建成功')
                 this.gid = response.data.data.gid
-                amapManager.getMap().setFitView()
+                let postData = {
+                  gid: this.gid,
+                  points: this.$refs.polygon_0.$$getPath()
+                }
+                this.axios.post(this.getAPI() + '/location/create-geofence', postData).then(response => {
+                  if (response.data === 100) {
+                    this.operationStatus = '围栏创建成功'
+                    console.log('围栏创建成功')
+                    amapManager.getMap().setFitView()
+                  }
+                }, response => {
+                  alert('围栏数据储存失败，将影响正常运作')
+                  this.operationStatus = '围栏数据储存失败，请删除并重新创建'
+                  console.log('围栏数据储存失败，请删除并重新创建')
+                  console.log(response)
+                })
                 this.disableClk = true
               } else {
                 this.mapView.polygon.visible = false
@@ -398,6 +413,7 @@ export default {
                 console.log('围栏创建失败: ' + response.data.data.message)
               }
             }, response => {
+              this.mapView.polygon.visible = false
               this.operationStatus = '请求失败，围栏创建失败'
               console.log('网络请求失败')
               console.log('围栏创建失败')
@@ -420,9 +436,22 @@ export default {
             this.axios.patch('https://restapi.amap.com/v4/geofence/meta?key=' + this.getMapKey() +
               '&gid=' + this.gid, modifyGeoFence, { withCredentials: false }).then(response => {
               if (response.data.data.message === '成功') {
-                this.operationStatus = '围栏更新成功'
-                amapManager.getMap().setFitView()
-                console.log('围栏更新成功')
+                let postData = {
+                  gid: this.gid,
+                  points: this.$refs.polygon_0.$$getPath()
+                }
+                this.axios.post(this.getAPI() + '/location/update-geofence', postData).then(response => {
+                  if (response.data === 100) {
+                    this.operationStatus = '围栏更新成功'
+                    amapManager.getMap().setFitView()
+                    console.log('围栏更新成功')
+                  }
+                }, response => {
+                  alert('围栏数据储存失败，将影响正常运作')
+                  this.operationStatus = '围栏数据储存失败，请重新更新围栏数据'
+                  console.log('围栏数据储存失败，请重新更新围栏数据')
+                  console.log(response)
+                })
               } else {
                 this.mapView.polygon.path = this.previousPath
                 this.operationStatus = '围栏更新失败: ' + response.data.data.message
@@ -448,6 +477,17 @@ export default {
                 this.mapView.polygon.editable = false
                 this.disableClk = false
                 this.mapView.polygon.path = []
+                let postData = {
+                  gid: this.gid
+                }
+                this.axios.post(this.getAPI() + '/location/delete-geofence', postData).then(response => {
+                  if (response.data === 100) {
+                    console.log('数据库围栏删除成功')
+                  }
+                }, response => {
+                  console.log('数据库围栏删除失败')
+                  console.log(response)
+                })
               } else {
                 this.operationStatus = '围栏删除失败：' + response.data.data.message
                 console.log('围栏删除失败：' + response.data.data.message)
