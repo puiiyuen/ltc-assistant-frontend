@@ -77,15 +77,9 @@ export default new Router({
           meta: { requireAuth: true }
         },
         {// SOS
-          path: 'sos',
-          name: 'SOS',
-          component: () => import('./components/Panel/security/SOS'),
-          meta: { requireAuth: true }
-        },
-        {// SOS
-          path: 'warning',
-          name: 'warning',
-          component: () => import('./components/Panel/security/warning'),
+          path: 'monitor',
+          name: 'monitor',
+          component: () => import('./components/Panel/security/monitor'),
           meta: { requireAuth: true }
         }
         // add more children

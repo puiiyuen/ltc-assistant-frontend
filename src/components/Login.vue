@@ -105,7 +105,7 @@ export default {
       })
     },
     async login () {
-      let postData = { 'userId': this.form.userId, 'password': this.form.password }
+      let postData = { 'userId': this.form.userId, 'password': this.form.password, 'platform': 'CONSOLE' }
       let statusCode = 200
       await this.axios.post(this.getAPI() + '/login', postData, { timeout: 15000 }).then(response => {
         statusCode = response.data

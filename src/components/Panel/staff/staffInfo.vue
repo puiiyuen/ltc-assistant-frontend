@@ -25,17 +25,26 @@
         <th scope="col">出生年月</th>
         <th scope="col">电话</th>
         <th scope="col">在岗状态</th>
+        <th scope="col">操作</th>
       </tr>
       </thead>
       <tbody>
       <tr v-if="staffs.length === 0" style="text-align: center">
         <td colspan="7">暂无员工</td>
       </tr>
-      <tr v-for="(object,index) in staffs" @click="getDetail(index)" id="main-table-tr"
-          data-toggle="tooltip" title="点击查看详情">
+      <tr v-for="(object,index) in staffs">
         <th scope="row">{{index+1}}</th>
         <td v-for="value in object">
           {{value}}
+        </td>
+        <td>
+          <button class="btn btn-info btn-sm" @click="getDetail(index)">详情</button>
+          <template v-if="object.status==='空闲'">
+            <button class="btn btn-danger btn-sm" @click="staffAttendance(index,0)">下班</button>
+          </template>
+          <template v-if="object.status==='下班'">
+            <button class="btn btn-primary btn-sm " @click="staffAttendance(index,1)">上班</button>
+          </template>
         </td>
       </tr>
       </tbody>
@@ -807,6 +816,36 @@ export default {
         }
       })
     },
+    staffAttendance (index, status) {
+      this.checkSession().then(response => {
+        if (response) {
+          let postData = {
+            staffId: this.staffs[index].id,
+            status: status
+          }
+          this.axios.post(this.getAPI() + '/staff/attendance', postData).then(response => {
+            if (response.data === 100) {
+              let temp = this.staffs[index]
+              if (status === 0) {
+                temp.status = '下班'
+                this.staffs.splice(index, 1, temp)
+              } else if (status === 1) {
+                temp.status = '空闲'
+                this.staffs.splice(index, 1, temp)
+              }
+            } else if (response.data === 200) {
+              console.log('上下班操作失败')
+              console.log(response.data)
+            }
+          }, response => {
+            console.log('post attendance status failed')
+            console.log(response)
+          })
+        } else {
+          $('#loginModal').modal('show')
+        }
+      })
+    },
     onReset (evt) {
       evt.preventDefault()
       if (this.hasClicked) {
@@ -888,9 +927,6 @@ export default {
 </script>
 
 <style scoped>
-  #main-table-tr:hover {
-    cursor: pointer;
-  }
 
   #panel-title {
     padding: 20px 0;
@@ -899,6 +935,10 @@ export default {
 
   #info-table {
     width: 90%;
+  }
+
+  #info-table button{
+    margin-right: 5px;
   }
 
   #search-bar {

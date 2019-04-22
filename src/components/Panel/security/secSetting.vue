@@ -64,16 +64,17 @@
         <div class="col-1"></div>
       </div>
 
-      <label for="geo-fence-info"><strong>电子围栏信息</strong></label>
-      <div  id="geo-fence-info">
-        <div class="row">
-          <div class="col-12">
-            {{geoFence.name}}<br>
-            {{geoFence.valid_time}}<br>
-            {{geoFence.enable}}
-          </div>
-        </div>
-      </div>
+      <!--<label for="geo-fence-info"><strong>电子围栏信息</strong></label>-->
+      <!--<div  id="geo-fence-info">-->
+        <!--<div class="row">-->
+          <!--<div class="col-12">-->
+            <!--{{geoFence.name}}<br>-->
+            <!--{{geoFence.valid_time}}<br>-->
+            <!--{{geoFence.enable}}-->
+          <!--</div>-->
+        <!--</div>-->
+      <!--</div>-->
+
     </div>
 
     <!--delete confirm-->

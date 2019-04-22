@@ -82,7 +82,6 @@ async function checkSession () {
   let isOnline = false
   await axios.get(Vue.prototype.getAPI() + '/session').then(response => {
     if (response.data === 300) {
-      console.log('online ' + response.data)
       isOnline = true
     }
   }, response => {

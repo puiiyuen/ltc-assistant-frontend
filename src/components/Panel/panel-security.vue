@@ -22,7 +22,8 @@
          >
            <el-amap-marker
              v-for="marker in mapView.markers"
-             :position="marker">
+             :position="marker"
+           >
            </el-amap-marker>
            <el-amap-polygon :path="mapView.polygon.path" :editable="mapView.polygon.editable" :ref="`polygon_0`"
                             :events="mapView.polygon.events" :draggable="mapView.polygon.editable"
@@ -175,9 +176,18 @@ export default {
               this.mapView.polygon.visible = true
               this.setPolygonPath(response.data.data.rs_list[0].points)
               this.setMapCenter(response.data.data.rs_list[0].center)
-              this.mapView.markers.push([113.874908, 22.902537])
-              this.mapView.markers.push([113.874908, 22.905000])
-              this.mapView.markers.push([113.879000, 22.902537])
+              this.mapView.markers = []
+              this.axios.get(this.getAPI() + '/security/fence-monitor').then(response => {
+                for (let i = 0; i < response.data.length; i++) {
+                  let location = []
+                  location.push(response.data[i].longitude)
+                  location.push(response.data[i].latitude)
+                  this.mapView.markers.push(location)
+                }
+              }, response => {
+                console.log('get user location marker failed')
+                console.log(response)
+              })
               this.operationStatus = '围栏获取成功'
               amapManager.getMap().setFitView()
             } else {
@@ -208,7 +218,7 @@ export default {
 
   .amap-wrapper{
     width: 100%;
-    height: 700px;
+    height: 650px;
   }
 
   #panel-title {

@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     user: {
       navname: 'noname',
+      adminId: -1,
       online: false
     }
   },
@@ -14,11 +15,13 @@ export default new Vuex.Store({
     setUser () {
       const user = JSON.parse(localStorage.getItem('user'))
       this.state.user.navname = user.username
+      this.state.user.adminId = user.userId
       this.state.user.online = true
     },
     setDefaultUser () {
       localStorage.clear()
       this.state.user.navname = 'noname'
+      this.state.user.adminId = -1
       this.state.user.online = false
     }
   },
@@ -28,6 +31,9 @@ export default new Vuex.Store({
     },
     getOnline (state) {
       return state.user.online
+    },
+    getAdminId (state) {
+      return state.user.adminId
     }
   },
   actions: {
