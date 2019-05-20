@@ -1,12 +1,12 @@
 <template>
     <div>
-      <h1>staff movement</h1>
+      <router-view/>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'staffMovement'
+  name: 'notices'
 }
 </script>
 

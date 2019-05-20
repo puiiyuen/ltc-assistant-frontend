@@ -112,6 +112,7 @@
               <div class="col-4">
                 <button class="btn btn-primary btn-sm" data-dismiss="modal" @click="modifyStaffSwitchOn">修改资料</button>
                 <button class="btn btn-danger btn-sm" @click="destroyStaffSwitchOn">注销账户</button>
+                <button class="btn btn-warning btn-sm" >授权管理员</button>
               </div>
               <div class="col-4"></div>
               <div class="col-4"></div>

@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <Navbar/>
+    <Navbar v-show="!hideNavBar"/>
     <!-- Position it -->
     <div style="position: absolute; top: 60px; right: 0; z-index: 9999">
       <!-- Then put toasts within -->
       <div id="incident-toast" class="toast fade" role="alert" data-autohide="false" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
           <strong class="mr-auto">紧急状况</strong>
-          <small class="text-muted">{{$moment().format('HH:mm')}}</small>
+          <small class="text-muted">{{alertTime}}</small>
           <button @click="closeToast" type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -34,7 +34,9 @@ export default {
   data () {
     return {
       timer: 0,
-      incidentId: -1
+      incidentId: -1,
+      alertTime: this.$moment().format('HH:mm'),
+      hideNavBar: false
     }
   },
   computed: {
@@ -49,6 +51,11 @@ export default {
           this.getIncidentAlert()
         }, 5000)
       }
+    },
+
+    '$route.name' (newVal) {
+      let routerName = ['notice1', 'notice2', 'notice3']
+      this.hideNavBar = routerName.indexOf(newVal) !== -1
     }
   },
   methods: {
@@ -66,6 +73,7 @@ export default {
       })
     },
     switchOnToast () {
+      this.alertTime = this.$moment().format('HH:mm')
       $('#incident-toast').toast('show')
     },
     closeToast () {

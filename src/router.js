@@ -133,14 +133,33 @@ export default new Router({
           name: 'assignment',
           component: () => import('./components/Panel/staff/assignment'),
           meta: { requireAuth: true }
-        },
-        {// staff movement
-          path: 'staff-movement',
-          name: 'staffMovement',
-          component: () => import('./components/Panel/staff/staffMovement'),
-          meta: { requireAuth: true }
         }
         // add more children
+      ]
+    },
+    {
+      path: '/notices',
+      meta: { requireAuth: false },
+      component: () => import('./components/Panel/message/notices/notices'),
+      children: [
+        {
+          path: '1',
+          name: 'notice1',
+          meta: { requireAuth: false },
+          component: () => import('./components/Panel/message/notices/notice1')
+        },
+        {
+          path: '2',
+          name: 'notice2',
+          meta: { requireAuth: false },
+          component: () => import('./components/Panel/message/notices/notice2')
+        },
+        {
+          path: '3',
+          name: 'notice3',
+          meta: { requireAuth: false },
+          component: () => import('./components/Panel/message/notices/notice3')
+        }
       ]
     },
     {
